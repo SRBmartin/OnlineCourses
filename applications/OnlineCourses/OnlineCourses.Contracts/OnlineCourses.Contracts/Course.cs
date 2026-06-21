@@ -2,34 +2,10 @@ namespace OnlineCourses.Contracts;
 
 public class Course
 {
-    private Guid id;
-    private string name;
-    private string field;
-    private string lecturer;
-
-    public Guid Id
-    {
-        get { throw new NotImplementedException(); }
-        set { throw new NotImplementedException(); }
-    }
-
-    public string Name
-    {
-        get { throw new NotImplementedException(); }
-        set { throw new NotImplementedException(); }
-    }
-
-    public string Field
-    {
-        get { throw new NotImplementedException(); }
-        set { throw new NotImplementedException(); }
-    }
-
-    public string Lecturer
-    {
-        get { throw new NotImplementedException(); }
-        set { throw new NotImplementedException(); }
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Field { get; set; }
+    public string Lecturer { get; set; }
 
     public Course()
     {
