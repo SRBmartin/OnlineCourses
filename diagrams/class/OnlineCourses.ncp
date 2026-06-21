@@ -252,9 +252,14 @@
   (XmlDataPersistence, JsonDataPersistence)
 + Repository (architecture): commands and
   the WCF service work over
-  ICourseRepository / IActivityRepository</Text>
+  ICourseRepository / IActivityRepository
+
+WCF: IInformationSystemService is [ServiceContract].
+InformationSystemService maps domain
+ParticipantActivity (this diagram) to the
+Contracts DTO on transfer.</Text>
         <Location left="509" top="1318" />
-        <Size width="265" height="300" />
+        <Size width="265" height="360" />
       </Entity>
       <Entity type="Class">
         <Name>InformationSystemService</Name>
@@ -784,9 +789,13 @@
 Note: ReducedActivity keeps only concrete
 activity data; key format "CourseID-Date1-Date2".
 Status is retained so RecommendedCountStrategy
-can count Recommended occurrences.</Text>
+can count Recommended occurrences.
+
+WCF: IInformationSystemService is [ServiceContract].
+ParticipantActivity here is the Contracts DTO
+([DataContract], data fields only).</Text>
         <Location left="19" top="240" />
-        <Size width="360" height="240" />
+        <Size width="360" height="300" />
       </Entity>
       <Entity type="Enum">
         <Name>CourseStatus</Name>
