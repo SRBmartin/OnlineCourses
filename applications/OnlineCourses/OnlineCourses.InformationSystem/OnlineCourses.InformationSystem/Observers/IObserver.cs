@@ -1,4 +1,4 @@
-namespace OnlineCourses.Contracts;
+namespace OnlineCourses.InformationSystem.Observers;
 
 public interface IObserver
 {

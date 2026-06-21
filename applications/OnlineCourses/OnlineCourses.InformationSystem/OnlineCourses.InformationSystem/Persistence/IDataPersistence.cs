@@ -1,4 +1,5 @@
 using OnlineCourses.Contracts;
+using ParticipantActivity = OnlineCourses.InformationSystem.Models.ParticipantActivity;
 
 namespace OnlineCourses.InformationSystem.Persistence;
 

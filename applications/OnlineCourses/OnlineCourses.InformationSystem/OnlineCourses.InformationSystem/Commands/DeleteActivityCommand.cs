@@ -1,4 +1,4 @@
-using OnlineCourses.Contracts;
+using OnlineCourses.InformationSystem.Models;
 using OnlineCourses.InformationSystem.Repositories;
 
 namespace OnlineCourses.InformationSystem.Commands;

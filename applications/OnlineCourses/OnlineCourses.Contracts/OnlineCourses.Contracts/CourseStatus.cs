@@ -1,9 +1,12 @@
+using System.Runtime.Serialization;
+
 namespace OnlineCourses.Contracts;
 
+[DataContract]
 public enum CourseStatus
 {
-    Popular,
-    DecliningInterest,
-    Recommended,
-    Archived
+    [EnumMember] Popular,
+    [EnumMember] DecliningInterest,
+    [EnumMember] Recommended,
+    [EnumMember] Archived
 }

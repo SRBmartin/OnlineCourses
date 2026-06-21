@@ -1,5 +1,3 @@
-using OnlineCourses.Contracts;
-
 namespace OnlineCourses.InformationSystem.Observers;
 
 public class ChartObserver : IObserver
