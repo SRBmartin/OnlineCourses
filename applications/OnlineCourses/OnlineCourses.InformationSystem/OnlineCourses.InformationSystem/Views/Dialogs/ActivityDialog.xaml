@@ -1,0 +1,23 @@
+<!-- IS-4: Implement ActivityDialog for Add / Edit activity.
+     IS-4: Fields — Course (ComboBox bound to Courses collection), CaptureTime (DatePicker),
+           EnrollmentCount (TextBox, int >= 0), ProcessedTopicsCount (TextBox, int >= 0),
+           AverageGrade (TextBox, double 0–10).
+     IS-4: DataContext = ActivityDialogViewModel (set from code-behind constructor).
+     IS-4: Window size: Width=420, Height=310. -->
+<Window x:Class="OnlineCourses.InformationSystem.Views.Dialogs.ActivityDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Title}"
+        Width="420" Height="310"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+
+    <!-- IS-4: Build the form layout here -->
+    <Grid Margin="20,16,20,16">
+        <TextBlock Text="Activity form — IS-4"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="#AAAAAA" FontStyle="Italic"/>
+    </Grid>
+</Window>
