@@ -1,9 +1,8 @@
-﻿<Application x:Class="OnlineCourses.InformationSystem.App"
+<Application x:Class="OnlineCourses.InformationSystem.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:OnlineCourses.InformationSystem"
-             StartupUri="MainWindow.xaml">
+             xmlns:local="clr-namespace:OnlineCourses.InformationSystem">
+    <!--  StartupUri removed — window is created in App.OnStartup for proper DI wiring.  -->
     <Application.Resources>
-         
     </Application.Resources>
 </Application>
