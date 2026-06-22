@@ -5,16 +5,16 @@ namespace OnlineCourses.InformationSystem.Commands;
 
 public class AddCourseCommand : IUndoableCommand
 {
-    private Course _course;
-    private ICourseRepository _repository;
+    private readonly Course _course;
+    private readonly ICourseRepository _repository;
 
-    public void Execute()
+    public AddCourseCommand(Course course, ICourseRepository repository)
     {
-        throw new NotImplementedException();
+        _course = course;
+        _repository = repository;
     }
 
-    public void Undo()
-    {
-        throw new NotImplementedException();
-    }
+    public void Execute() => _repository.Add(_course);
+
+    public void Undo() => _repository.Remove(_course.Id);
 }

@@ -1,9 +1,11 @@
 using ICommand = System.Windows.Input.ICommand;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Data;
 using OnlineCourses.InformationSystem.Commands;
 using OnlineCourses.InformationSystem.Repositories;
+using OnlineCourses.InformationSystem.Views.Dialogs;
 
 namespace OnlineCourses.InformationSystem.ViewModels;
 
@@ -81,7 +83,22 @@ public class MainViewModel : ViewModelBase
         UndoCommand         = new RelayCommand(_ => _commandManager.Undo(), _ => _commandManager.CanUndo);
         RedoCommand         = new RelayCommand(_ => _commandManager.Redo(), _ => _commandManager.CanRedo);
 
-        _commandManager.HistoryChanged += () => System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        _commandManager.HistoryChanged += () =>
+        {
+            SyncCoursesFromRepository();
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        };
+
+        SyncCoursesFromRepository();
+    }
+
+    private void SyncCoursesFromRepository()
+    {
+        var selectedId = _selectedCourse?.Id;
+        _courses.Clear();
+        foreach (var course in _courseRepository.GetAll())
+            _courses.Add(new CourseViewModel(course));
+        SelectedCourse = _courses.FirstOrDefault(c => c.Id == selectedId);
     }
 
     private bool FilterCourse(object obj) =>
@@ -93,20 +110,47 @@ public class MainViewModel : ViewModelBase
 
     private void ExecuteAddCourse()
     {
-        // IS-2: Open CourseDialog("Add Course"), wrap result in AddCourseCommand,
-        //       execute via _commandManager, add returned CourseViewModel to _courses.
+        CourseDialog dialog = null!;
+        var vm = new CourseDialogViewModel("Add Course", () => dialog.Close());
+        dialog = new CourseDialog(vm) { Owner = Application.Current.MainWindow };
+        dialog.ShowDialog();
+
+        if (!vm.Confirmed) return;
+
+        var course = vm.ToCourseViewModel().ToModel();
+        _commandManager.ExecuteCommand(new AddCourseCommand(course, _courseRepository));
     }
 
     private void ExecuteEditCourse()
     {
-        // IS-2: Open CourseDialog("Edit Course", _selectedCourse), wrap result in
-        //       EditCourseCommand, execute via _commandManager, update item in _courses.
+        if (_selectedCourse == null) return;
+
+        CourseDialog dialog = null!;
+        var vm = new CourseDialogViewModel("Edit Course", () => dialog.Close(), _selectedCourse);
+        dialog = new CourseDialog(vm) { Owner = Application.Current.MainWindow };
+        dialog.ShowDialog();
+
+        if (!vm.Confirmed) return;
+
+        var oldCourse = _selectedCourse.ToModel();
+        var newCourse = vm.ToCourseViewModel(existingId: _selectedCourse.Id).ToModel();
+        _commandManager.ExecuteCommand(new EditCourseCommand(oldCourse, newCourse, _courseRepository));
     }
 
     private void ExecuteDeleteCourse()
     {
-        // IS-2: Confirm with MessageBox, wrap in DeleteCourseCommand,
-        //       execute via _commandManager, remove from _courses.
+        if (_selectedCourse == null) return;
+
+        var result = MessageBox.Show(
+            $"Delete '{_selectedCourse.Name}'?",
+            "Confirm Delete",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        var course = _selectedCourse.ToModel();
+        _commandManager.ExecuteCommand(new DeleteCourseCommand(course, _courseRepository));
     }
 
     // IS-3: private void LoadActivities(CourseViewModel? course)

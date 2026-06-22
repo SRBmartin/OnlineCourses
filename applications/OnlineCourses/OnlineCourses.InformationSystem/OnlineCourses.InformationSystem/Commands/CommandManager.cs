@@ -12,16 +12,43 @@ public class CommandManager
 
     public void ExecuteCommand(IUndoableCommand command)
     {
-        throw new NotImplementedException();
+        command.Execute();
+        _undoStack.Push(command);
+        _redoStack.Clear();
+        HistoryChanged?.Invoke();
     }
 
     public void Undo()
     {
-        throw new NotImplementedException();
+        if (!CanUndo) return;
+        var command = _undoStack.Pop();
+        try
+        {
+            command.Undo();
+            _redoStack.Push(command);
+        }
+        catch
+        {
+            _undoStack.Push(command);
+            throw;
+        }
+        HistoryChanged?.Invoke();
     }
 
     public void Redo()
     {
-        throw new NotImplementedException();
+        if (!CanRedo) return;
+        var command = _redoStack.Pop();
+        try
+        {
+            command.Execute();
+            _undoStack.Push(command);
+        }
+        catch
+        {
+            _redoStack.Push(command);
+            throw;
+        }
+        HistoryChanged?.Invoke();
     }
 }

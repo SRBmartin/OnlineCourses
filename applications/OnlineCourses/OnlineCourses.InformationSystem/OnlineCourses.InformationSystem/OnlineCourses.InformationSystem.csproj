@@ -17,4 +17,10 @@
     <ProjectReference Include="..\..\OnlineCourses.Contracts\OnlineCourses.Contracts\OnlineCourses.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Data\courses.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
