@@ -1,5 +1,6 @@
 using OnlineCourses.Contracts;
 using OnlineCourses.InformationSystem.Repositories;
+using DomainActivity = OnlineCourses.InformationSystem.Models.ParticipantActivity;
 
 namespace OnlineCourses.InformationSystem.Services;
 
@@ -15,12 +16,10 @@ public class InformationSystemService : IInformationSystemService
     }
 
     public List<ParticipantActivity> GetActivities(Guid courseId, DateTime from, DateTime to)
-    {
-        throw new NotImplementedException();
-    }
+        => _activityRepository.GetByCourseAndPeriod(courseId, from, to)
+                              .Select(a => a.ToDto())
+                              .ToList();
 
     public List<Course> GetAllCourses()
-    {
-        throw new NotImplementedException();
-    }
+        => _courseRepository.GetAll();
 }
