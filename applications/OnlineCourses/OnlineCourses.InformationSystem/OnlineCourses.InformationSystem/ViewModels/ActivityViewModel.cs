@@ -1,12 +1,36 @@
-// IS-3: Implement ActivityViewModel wrapping InformationSystem.Models.ParticipantActivity.
-// IS-3: Properties — CourseId (Guid), CaptureTime (DateTime), EnrollmentCount (int),
-//        ProcessedTopicsCount (int), AverageGrade (double), StatusName (string).
-// IS-3: StatusName formats CourseStatus enum: e.g. DecliningInterest → "Declining Interest".
-// IS-3: Add static FromActivity(ParticipantActivity) factory and ToActivity() method.
+using OnlineCourses.Contracts;
+using OnlineCourses.InformationSystem.States;
+using DomainActivity = OnlineCourses.InformationSystem.Models.ParticipantActivity;
 
 namespace OnlineCourses.InformationSystem.ViewModels;
 
 public class ActivityViewModel : ViewModelBase
 {
-    // IS-3: Properties go here
+    private readonly DomainActivity _activity;
+
+    public ActivityViewModel(DomainActivity activity, string courseName)
+    {
+        _activity  = activity;
+        CourseName = courseName;
+    }
+
+    public Guid Id                  => _activity.Id;
+    public Guid CourseId            => _activity.CourseId;
+    public string CourseName        { get; }
+    public DateTime CaptureTime     => _activity.CaptureTime;
+    public int EnrollmentCount      => _activity.EnrollmentCount;
+    public int ProcessedTopicsCount => _activity.ProcessedTopicsCount;
+    public double AverageGrade      => _activity.AverageGrade;
+    public string StatusName             => FormatStatus(_activity.Status);
+    public ICourseStatusState CurrentState => _activity.CurrentState;
+
+    internal DomainActivity Activity => _activity;
+
+    public void RefreshStatus() => OnPropertyChanged(nameof(StatusName));
+
+    private static string FormatStatus(CourseStatus s) => s switch
+    {
+        CourseStatus.DecliningInterest => "Declining Interest",
+        _ => s.ToString()
+    };
 }
