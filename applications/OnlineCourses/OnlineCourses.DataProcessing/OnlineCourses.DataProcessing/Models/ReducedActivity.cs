@@ -10,8 +10,5 @@ public class ReducedActivity
     public double AverageGrade { get; set; }
     public CourseStatus Status { get; set; }
 
-    public ReducedActivity()
-    {
-        throw new NotImplementedException();
-    }
+
 }

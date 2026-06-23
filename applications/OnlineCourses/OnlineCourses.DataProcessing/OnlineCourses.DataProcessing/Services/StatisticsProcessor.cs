@@ -8,29 +8,36 @@ namespace OnlineCourses.DataProcessing.Services;
 
 public class StatisticsProcessor
 {
-    private IStatisticalStrategy _strategy;
-    private IActivityAdapter _adapter;
-    private IInformationSystemService _service;
-    private Dictionary<string, List<ReducedActivity>> _data;
-    private ICsvExporter _csvExporter;
+    private IStatisticalStrategy? _strategy;
+    private readonly IActivityAdapter _adapter;
+    private readonly IInformationSystemService _service;
+    private Dictionary<string, List<ReducedActivity>> _data = new();
+    private readonly ICsvExporter _csvExporter;
 
     public StatisticsProcessor(IInformationSystemService service, IActivityAdapter adapter, ICsvExporter csvExporter)
     {
-        throw new NotImplementedException();
+        // DP-7: Assign all injected dependencies.
+        _service     = service;
+        _adapter     = adapter;
+        _csvExporter = csvExporter;
     }
 
     public void SetStrategy(IStatisticalStrategy strategy)
     {
-        throw new NotImplementedException();
+        // DP-8: Assign the chosen strategy (Strategy pattern).
+        _strategy = strategy;
     }
 
     public string RunStatistics(Guid courseId, DateTime from, DateTime to)
     {
-        throw new NotImplementedException();
+        // DP-7: Fetch activities from _service, adapt via _adapter, store in _data.
+        // DP-8: Call _strategy.Calculate(_data) and return the result string.
+        throw new NotImplementedException("DP-7 / DP-8");
     }
 
     public void ExportToCsv(string result, string filePath)
     {
-        throw new NotImplementedException();
+        // DP-9: Delegate to _csvExporter.Export.
+        _csvExporter.Export(result, filePath);
     }
 }

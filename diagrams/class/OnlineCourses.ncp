@@ -218,9 +218,20 @@
         <Name>ChartObserver</Name>
         <Access>Public</Access>
         <Location left="2710" top="478" />
-        <Size width="225" height="94" />
+        <Size width="325" height="320" />
         <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;ParticipantActivity&gt; _trackedActivities</Member>
+        <Member type="Field">private ObservableValue _popularValue</Member>
+        <Member type="Field">private ObservableValue _decliningValue</Member>
+        <Member type="Field">private ObservableValue _recommendedValue</Member>
+        <Member type="Field">private ObservableValue _archivedValue</Member>
+        <Member type="Property">public ISeries[] Series { get; }</Member>
+        <Member type="Property">public Axis[] XAxes { get; }</Member>
+        <Member type="Property">public Axis[] YAxes { get; }</Member>
+        <Member type="Constructor">public ChartObserver()</Member>
+        <Member type="Method">public void SetActivities(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
         <Member type="Method">public void Update(string message)</Member>
+        <Member type="Method">private void Recount()</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
