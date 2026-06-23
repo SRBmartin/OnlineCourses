@@ -23,32 +23,32 @@ public class ChartObserver : IObserver
 
     public ChartObserver()
     {
-        Series = new ISeries[]
-        {
+        Series =
+        [
             new ColumnSeries<ObservableValue>
             {
                 Values = new[] { _popularValue, _decliningValue, _recommendedValue, _archivedValue },
                 Name   = "Activities",
                 Fill   = new SolidColorPaint(new SKColor(79, 129, 189))
             }
-        };
+        ];
 
-        XAxes = new[]
-        {
+        XAxes =
+        [
             new Axis
             {
                 Labels         = new[] { "Popular", "Declining", "Recommended", "Archived" },
                 LabelsRotation = 0
             }
-        };
+        ];
 
-        YAxes = new[]
-        {
+        YAxes =
+        [
             new Axis
             {
                 MinLimit = 0
             }
-        };
+        ];
     }
 
     public void SetActivities(IEnumerable<DomainActivity> activities)
@@ -71,10 +71,18 @@ public class ChartObserver : IObserver
         {
             switch (a.Status)
             {
-                case CourseStatus.Popular:           popular++;     break;
-                case CourseStatus.DecliningInterest: declining++;   break;
-                case CourseStatus.Recommended:       recommended++; break;
-                case CourseStatus.Archived:          archived++;    break;
+                case CourseStatus.Popular:
+                    popular++;
+                    break;
+                case CourseStatus.DecliningInterest:
+                    declining++;
+                    break;
+                case CourseStatus.Recommended:
+                    recommended++;
+                    break;
+                case CourseStatus.Archived:
+                    archived++;
+                    break;
             }
         }
 
