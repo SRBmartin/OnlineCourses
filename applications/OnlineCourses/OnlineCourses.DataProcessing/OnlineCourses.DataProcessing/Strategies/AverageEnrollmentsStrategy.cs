@@ -6,6 +6,8 @@ public class AverageEnrollmentsStrategy : IStatisticalStrategy
 {
     public string Calculate(Dictionary<string, List<ReducedActivity>> data)
     {
-        throw new NotImplementedException();
+        // DP-8: For each key in data, compute the average EnrollmentCount across all entries.
+        //        Return results as a formatted string grouped by period key.
+        throw new NotImplementedException("DP-8");
     }
 }
