@@ -6,9 +6,13 @@ public interface IActivityRepository
 {
     void Add(ParticipantActivity activity);
 
+    void AddRange(IEnumerable<ParticipantActivity> activities);
+
     void Update(ParticipantActivity activity);
 
     void Remove(ParticipantActivity activity);
+
+    void RemoveRange(IEnumerable<ParticipantActivity> activities);
 
     List<ParticipantActivity> GetAll();
 

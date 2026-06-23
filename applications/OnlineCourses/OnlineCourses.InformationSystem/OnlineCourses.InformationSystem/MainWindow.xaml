@@ -24,6 +24,7 @@
                 <ColumnDefinition Width="*" MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Left panel: Courses -->
             <Grid Grid.Column="0" Margin="8,8,4,8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -58,12 +59,12 @@
                 </ListView>
 
                 <StackPanel Grid.Row="3" Orientation="Horizontal"
-                            HorizontalAlignment="Right" Margin="0,6,0,0">
-                    <Button Content="Add"    Width="60" Margin="0,0,4,0"
+                            HorizontalAlignment="Right" Margin="0,8,0,0">
+                    <Button Content="Add"    Width="64" Padding="4,3" Margin="0,0,8,0"
                             Command="{Binding AddCourseCommand}"/>
-                    <Button Content="Edit"   Width="60" Margin="0,0,4,0"
+                    <Button Content="Edit"   Width="64" Padding="4,3" Margin="0,0,8,0"
                             Command="{Binding EditCourseCommand}"/>
-                    <Button Content="Delete" Width="60"
+                    <Button Content="Delete" Width="64" Padding="4,3"
                             Command="{Binding DeleteCourseCommand}"/>
                 </StackPanel>
             </Grid>
@@ -73,6 +74,7 @@
                           VerticalAlignment="Stretch"
                           Background="#DDDDDD"/>
 
+            <!-- Right panel: Activities + Chart placeholder -->
             <Grid Grid.Column="2" Margin="4,8,8,8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="3*" MinHeight="180"/>
@@ -80,6 +82,7 @@
                     <RowDefinition Height="2*" MinHeight="140"/>
                 </Grid.RowDefinitions>
 
+                <!-- Activities section -->
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -87,42 +90,46 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                        <!-- IS-3: ActivitiesHeader binding shows "Activities — {CourseName}" when a course is selected. -->
                         <TextBlock Text="{Binding ActivitiesHeader}"
                                    FontSize="15" FontWeight="SemiBold"
                                    VerticalAlignment="Center"
                                    DockPanel.Dock="Left"/>
 
-                        <!-- IS-4: Uncomment activity action buttons when IS-4 is implemented.
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <Button Content="Add Activity"    Width="96"  Margin="0,0,4,0" Command="{Binding AddActivityCommand}"/>
-                            <Button Content="Edit"            Width="60"  Margin="0,0,4,0" Command="{Binding EditActivityCommand}"/>
-                            <Button Content="Delete"          Width="60"  Margin="0,0,4,0" Command="{Binding DeleteActivityCommand}"/>
-                            <Button Content="Simulate States" Width="112"                  Command="{Binding SimulateStatesCommand}"/>
+                            <Button Content="Add Activity"    Width="100" Padding="4,3" Margin="0,0,8,0"
+                                    Command="{Binding AddActivityCommand}"/>
+                            <Button Content="Edit"            Width="64"  Padding="4,3" Margin="0,0,8,0"
+                                    Command="{Binding EditActivityCommand}"/>
+                            <Button Content="Delete"          Width="64"  Padding="4,3" Margin="0,0,20,0"
+                                    Command="{Binding DeleteActivityCommand}"/>
+                            <Button Content="Simulate States" Width="124" Padding="4,3"
+                                    Command="{Binding SimulateStatesCommand}"/>
                         </StackPanel>
-                        -->
                     </DockPanel>
 
-                    <!-- IS-3: Replace this Border with the activities DataGrid bound to ActivitiesView:
-                         <DataGrid Grid.Row="1" ItemsSource="{Binding ActivitiesView}" SelectedItem="{Binding SelectedActivity}"
-                                   AutoGenerateColumns="False" IsReadOnly="True" SelectionUnit="FullRow" CanUserResizeRows="False" BorderThickness="1">
-                             <DataGrid.Columns>
-                                 <DataGridTextColumn Header="Date"      Width="100" Binding="{Binding CaptureTime, StringFormat=\{0:d\}}"/>
-                                 <DataGridTextColumn Header="Enrolled"  Width="76"  Binding="{Binding EnrollmentCount}"/>
-                                 <DataGridTextColumn Header="Topics"    Width="70"  Binding="{Binding ProcessedTopicsCount}"/>
-                                 <DataGridTextColumn Header="Avg Grade" Width="86"  Binding="{Binding AverageGrade, StringFormat=F2}"/>
-                                 <DataGridTextColumn Header="Status"    Width="*"   Binding="{Binding StatusName}"/>
-                             </DataGrid.Columns>
-                         </DataGrid>
-                    -->
-                    <Border Grid.Row="1"
-                            Background="#F8F8F8"
-                            BorderBrush="#DDDDDD" BorderThickness="1"
-                            CornerRadius="3">
-                        <TextBlock Text="Select a course to view its activities  (IS-3)"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   Foreground="#BBBBBB" FontStyle="Italic" FontSize="13"/>
-                    </Border>
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding ActivitiesView}"
+                              SelectedItem="{Binding SelectedActivity}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              SelectionUnit="FullRow"
+                              CanUserResizeRows="False"
+                              BorderThickness="1">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Course"     Width="140"
+                                                Binding="{Binding CourseName}"/>
+                            <DataGridTextColumn Header="Date"       Width="86"
+                                                Binding="{Binding CaptureTime, StringFormat=\{0:d\}}"/>
+                            <DataGridTextColumn Header="Enrolled"   Width="72"
+                                                Binding="{Binding EnrollmentCount}"/>
+                            <DataGridTextColumn Header="Topics"     Width="66"
+                                                Binding="{Binding ProcessedTopicsCount}"/>
+                            <DataGridTextColumn Header="Avg Grade"  Width="82"
+                                                Binding="{Binding AverageGrade, StringFormat=F2}"/>
+                            <DataGridTextColumn Header="Status"     Width="*"
+                                                Binding="{Binding StatusName}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
 
                 <GridSplitter Grid.Row="1"
@@ -130,10 +137,7 @@
                               VerticalAlignment="Stretch"
                               Background="#DDDDDD"/>
 
-                <!-- IS-5: Replace this Border with a CartesianChart:
-                     Add to Window element: xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
-                     <lvc:CartesianChart Series="{Binding ChartSeries}" XAxes="{Binding ChartXAxes}" YAxes="{Binding ChartYAxes}"/>
-                -->
+                <!-- IS-5: chart placeholder -->
                 <Border Grid.Row="2"
                         Background="#F8F8F8"
                         BorderBrush="#DDDDDD" BorderThickness="1"

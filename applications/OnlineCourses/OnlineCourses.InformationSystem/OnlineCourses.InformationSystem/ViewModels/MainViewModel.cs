@@ -4,28 +4,34 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using OnlineCourses.InformationSystem.Commands;
+using OnlineCourses.InformationSystem.Models;
+using OnlineCourses.InformationSystem.Observers;
 using OnlineCourses.InformationSystem.Repositories;
+using OnlineCourses.InformationSystem.States;
 using OnlineCourses.InformationSystem.Views.Dialogs;
 
 namespace OnlineCourses.InformationSystem.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private readonly ICourseRepository _courseRepository;
-    private readonly CommandManager    _commandManager;
+    private readonly ICourseRepository   _courseRepository;
+    private readonly IActivityRepository _activityRepository;
+    private readonly CommandManager      _commandManager;
+    private readonly IObserver            _logObserver;
 
-    // IS-3: private readonly IActivityRepository _activityRepository;
-    // IS-4: private LogObserver   _logObserver;
-    // IS-5: private ChartObserver _chartObserver;
+    private readonly ObservableCollection<CourseViewModel>   _courses    = new();
+    private readonly ObservableCollection<ActivityViewModel> _activities = new();
 
-    private readonly ObservableCollection<CourseViewModel> _courses = new();
-    private CourseViewModel? _selectedCourse;
-    private string _searchText = string.Empty;
+    private CourseViewModel?   _selectedCourse;
+    private ActivityViewModel? _selectedActivity;
+    private string             _searchText = string.Empty;
+    private bool               _isSimulating;
 
-    // IS-3: private readonly ObservableCollection<ActivityViewModel> _activities = new();
-    // IS-3: private ActivityViewModel? _selectedActivity;
+    public ICollectionView CoursesView    { get; }
+    public ICollectionView ActivitiesView { get; }
 
-    public ICollectionView CoursesView { get; }
+    public string ActivitiesHeader =>
+        _selectedCourse != null ? $"Activities — {_selectedCourse.Name}" : "Activities";
 
     public CourseViewModel? SelectedCourse
     {
@@ -34,8 +40,14 @@ public class MainViewModel : ViewModelBase
         {
             if (!SetField(ref _selectedCourse, value)) return;
             OnPropertyChanged(nameof(ActivitiesHeader));
-            // IS-3: LoadActivities(value);
+            LoadActivities(value);
         }
+    }
+
+    public ActivityViewModel? SelectedActivity
+    {
+        get => _selectedActivity;
+        set => SetField(ref _selectedActivity, value);
     }
 
     public string SearchText
@@ -48,40 +60,51 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    public string ActivitiesHeader =>
-        _selectedCourse != null ? $"Activities — {_selectedCourse.Name}" : "Activities";
-
-    // IS-3: public ICollectionView ActivitiesView { get; }
-    // IS-3: public ActivityViewModel? SelectedActivity { get => ...; set => ...; }
-
     public ICommand AddCourseCommand    { get; }
     public ICommand EditCourseCommand   { get; }
     public ICommand DeleteCourseCommand { get; }
     public ICommand UndoCommand         { get; }
     public ICommand RedoCommand         { get; }
 
-    // IS-3: public ICommand AddActivityCommand    { get; }
-    // IS-3: public ICommand EditActivityCommand   { get; }
-    // IS-3: public ICommand DeleteActivityCommand { get; }
-    // IS-4: public ICommand SimulateStatesCommand { get; }
+    public ICommand AddActivityCommand    { get; }
+    public ICommand EditActivityCommand   { get; }
+    public ICommand DeleteActivityCommand { get; }
+    public ICommand SimulateStatesCommand { get; }
 
-    public MainViewModel(ICourseRepository courseRepository, CommandManager commandManager)
+    public MainViewModel(ICourseRepository courseRepository, IActivityRepository activityRepository,
+        CommandManager commandManager, IObserver logObserver)
     {
-        _courseRepository = courseRepository;
-        _commandManager   = commandManager;
+        _courseRepository   = courseRepository;
+        _activityRepository = activityRepository;
+        _commandManager     = commandManager;
+        _logObserver        = logObserver;
 
-        CoursesView = CollectionViewSource.GetDefaultView(_courses);
+        CoursesView    = CollectionViewSource.GetDefaultView(_courses);
         CoursesView.Filter = FilterCourse;
 
-        // IS-3: ActivitiesView = CollectionViewSource.GetDefaultView(_activities);
-        // IS-4: _logObserver   = new LogObserver();
-        // IS-5: _chartObserver = new ChartObserver();
+        ActivitiesView = CollectionViewSource.GetDefaultView(_activities);
 
         AddCourseCommand    = new RelayCommand(_ => ExecuteAddCourse());
         EditCourseCommand   = new RelayCommand(_ => ExecuteEditCourse(),   _ => _selectedCourse != null);
         DeleteCourseCommand = new RelayCommand(_ => ExecuteDeleteCourse(), _ => _selectedCourse != null);
-        UndoCommand         = new RelayCommand(_ => _commandManager.Undo(), _ => _commandManager.CanUndo);
-        RedoCommand         = new RelayCommand(_ => _commandManager.Redo(), _ => _commandManager.CanRedo);
+
+        UndoCommand = new RelayCommand(_ =>
+        {
+            _commandManager.Undo();
+            _logObserver.Update("Undo last action");
+        }, _ => _commandManager.CanUndo);
+
+        RedoCommand = new RelayCommand(_ =>
+        {
+            _commandManager.Redo();
+            _logObserver.Update("Redo last action");
+        }, _ => _commandManager.CanRedo);
+
+        AddActivityCommand    = new RelayCommand(_ => ExecuteAddActivity(),    _ => _selectedCourse != null);
+        EditActivityCommand   = new RelayCommand(_ => ExecuteEditActivity(),   _ => _selectedActivity != null);
+        DeleteActivityCommand = new RelayCommand(_ => ExecuteDeleteActivity(), _ => _selectedActivity != null);
+        SimulateStatesCommand = new RelayCommand(_ => SimulateStatesAsync(),
+            _ => _selectedActivity != null && !_isSimulating);
 
         _commandManager.HistoryChanged += () =>
         {
@@ -101,12 +124,27 @@ public class MainViewModel : ViewModelBase
         SelectedCourse = _courses.FirstOrDefault(c => c.Id == selectedId);
     }
 
+    private void LoadActivities(CourseViewModel? course)
+    {
+        var selectedId = _selectedActivity?.Id;
+        _activities.Clear();
+        if (course == null) return;
+        foreach (var a in _activityRepository.GetAll().Where(a => a.CourseId == course.Id))
+        {
+            a.Subscribe(_logObserver);
+            _activities.Add(new ActivityViewModel(a, course.Name));
+        }
+        SelectedActivity = _activities.FirstOrDefault(a => a.Id == selectedId);
+    }
+
     private bool FilterCourse(object obj) =>
         obj is CourseViewModel c &&
         (string.IsNullOrEmpty(_searchText) ||
          c.Name.Contains(_searchText,     StringComparison.OrdinalIgnoreCase) ||
          c.Field.Contains(_searchText,    StringComparison.OrdinalIgnoreCase) ||
          c.Lecturer.Contains(_searchText, StringComparison.OrdinalIgnoreCase));
+
+    // --- Course CRUD ---
 
     private void ExecuteAddCourse()
     {
@@ -150,14 +188,103 @@ public class MainViewModel : ViewModelBase
         if (result != MessageBoxResult.Yes) return;
 
         var course = _selectedCourse.ToModel();
-        _commandManager.ExecuteCommand(new DeleteCourseCommand(course, _courseRepository));
+        _commandManager.ExecuteCommand(new DeleteCourseCommand(course, _courseRepository, _activityRepository));
     }
 
-    // IS-3: private void LoadActivities(CourseViewModel? course)
-    //       {
-    //           _activities.Clear();
-    //           if (course == null) return;
-    //           foreach (var a in _activityRepository.GetByCourseAndPeriod(course.Id, ...))
-    //               _activities.Add(ActivityViewModel.FromActivity(a));
-    //       }
+    private void ExecuteAddActivity()
+    {
+        if (_selectedCourse == null) return;
+
+        ActivityDialog dialog = null!;
+        var vm = new ActivityDialogViewModel("Add Activity", () => dialog.Close(),
+            _courses, _selectedCourse);
+        dialog = new ActivityDialog(vm) { Owner = Application.Current.MainWindow };
+        dialog.ShowDialog();
+
+        if (!vm.Confirmed) return;
+
+        var activity = vm.ToActivityModel();
+        _commandManager.ExecuteCommand(new AddActivityCommand(activity, _activityRepository));
+        _logObserver.Update(
+            $"Add activity {activity.Id}: course={activity.CourseId}, " +
+            $"date={activity.CaptureTime:d}, enrolled={activity.EnrollmentCount}, " +
+            $"topics={activity.ProcessedTopicsCount}, grade={activity.AverageGrade:F2}");
+    }
+
+    private void ExecuteEditActivity()
+    {
+        if (_selectedActivity == null) return;
+
+        ActivityDialog dialog = null!;
+        var vm = new ActivityDialogViewModel("Edit Activity", () => dialog.Close(),
+            _courses, _selectedCourse, _selectedActivity);
+        dialog = new ActivityDialog(vm) { Owner = Application.Current.MainWindow };
+        dialog.ShowDialog();
+
+        if (!vm.Confirmed) return;
+
+        var oldActivity = _selectedActivity.Activity;
+        var newActivity = vm.ToActivityModel();
+        _commandManager.ExecuteCommand(new EditActivityCommand(oldActivity, newActivity, _activityRepository));
+        _logObserver.Update(
+            $"Edit activity {newActivity.Id}: course={newActivity.CourseId}, " +
+            $"date={newActivity.CaptureTime:d}, enrolled={newActivity.EnrollmentCount}, " +
+            $"topics={newActivity.ProcessedTopicsCount}, grade={newActivity.AverageGrade:F2}");
+    }
+
+    private void ExecuteDeleteActivity()
+    {
+        if (_selectedActivity == null) return;
+
+        var result = MessageBox.Show(
+            $"Delete activity from {_selectedActivity.CaptureTime:d}?",
+            "Confirm Delete",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        var activity = _selectedActivity.Activity;
+        _commandManager.ExecuteCommand(new DeleteActivityCommand(activity, _activityRepository));
+        _logObserver.Update($"Delete activity {activity.Id} (date={activity.CaptureTime:d})");
+    }
+
+    private async void SimulateStatesAsync()
+    {
+        if (_selectedActivity == null || _isSimulating) return;
+
+        _isSimulating = true;
+        System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+
+        var vm             = _selectedActivity;
+        var activity       = vm.Activity;
+        var preSimActivity = ParticipantActivity.FromDto(activity.ToDto());
+
+        _logObserver.Update($"Simulate start for activity {activity.Id}");
+
+        try
+        {
+            // Reset to start of cycle, then drive transitions via the state machine.
+            activity.ChangeState(new PopularState());
+            vm.RefreshStatus();
+            await Task.Delay(600);
+
+            // Loop until the terminal state rather than counting transitions.
+            while (!(activity.CurrentState is ArchivedState))
+            {
+                activity.CurrentState.HandleState(activity);
+                vm.RefreshStatus();
+                await Task.Delay(600);
+            }
+
+            // Route through CommandManager so simulation is undoable.
+            _commandManager.ExecuteCommand(new EditActivityCommand(preSimActivity, activity, _activityRepository));
+            _logObserver.Update($"Simulate complete for activity {activity.Id}, final: {activity.Status}");
+        }
+        finally
+        {
+            _isSimulating = false;
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        }
+    }
 }

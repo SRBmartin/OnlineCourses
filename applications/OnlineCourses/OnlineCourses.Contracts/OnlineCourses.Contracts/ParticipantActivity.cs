@@ -5,6 +5,7 @@ namespace OnlineCourses.Contracts;
 [DataContract]
 public class ParticipantActivity
 {
+    [DataMember] public Guid Id { get; set; }
     [DataMember] public Guid CourseId { get; set; }
     [DataMember] public DateTime CaptureTime { get; set; }
     [DataMember] public int EnrollmentCount { get; set; }

@@ -5,12 +5,13 @@ namespace OnlineCourses.InformationSystem.Services;
 
 public class InformationSystemService : IInformationSystemService
 {
-    private ICourseRepository _courseRepository;
-    private IActivityRepository _activityRepository;
+    private readonly ICourseRepository   _courseRepository;
+    private readonly IActivityRepository _activityRepository;
 
     public InformationSystemService(ICourseRepository courseRepository, IActivityRepository activityRepository)
     {
-        throw new NotImplementedException();
+        _courseRepository   = courseRepository;
+        _activityRepository = activityRepository;
     }
 
     public List<ParticipantActivity> GetActivities(Guid courseId, DateTime from, DateTime to)

@@ -5,13 +5,8 @@ namespace OnlineCourses.InformationSystem.States;
 
 public class PopularState : ICourseStatusState
 {
-    public void HandleState(ParticipantActivity context)
-    {
-        throw new NotImplementedException();
-    }
+    public CourseStatus GetStatus() => CourseStatus.Popular;
 
-    public CourseStatus GetStatus()
-    {
-        throw new NotImplementedException();
-    }
+    public void HandleState(ParticipantActivity context)
+        => context.ChangeState(new DecliningInterestState());
 }

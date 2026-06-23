@@ -5,16 +5,16 @@ namespace OnlineCourses.InformationSystem.Commands;
 
 public class DeleteActivityCommand : IUndoableCommand
 {
-    private ParticipantActivity _activity;
-    private IActivityRepository _repository;
+    private readonly ParticipantActivity _activity;
+    private readonly IActivityRepository _repository;
 
-    public void Execute()
+    public DeleteActivityCommand(ParticipantActivity activity, IActivityRepository repository)
     {
-        throw new NotImplementedException();
+        _activity   = activity;
+        _repository = repository;
     }
 
-    public void Undo()
-    {
-        throw new NotImplementedException();
-    }
+    public void Execute() => _repository.Remove(_activity);
+
+    public void Undo() => _repository.Add(_activity);
 }

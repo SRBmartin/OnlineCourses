@@ -62,26 +62,26 @@
         <Name>ParticipantActivity</Name>
         <Access>Public</Access>
         <Location left="67" top="1318" />
-        <Size width="280" height="385" />
+        <Size width="350" height="510" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">private Guid courseId</Member>
-        <Member type="Field">private DateTime captureTime</Member>
-        <Member type="Field">private int enrollmentCount</Member>
-        <Member type="Field">private int processedTopicsCount</Member>
-        <Member type="Field">private double averageGrade</Member>
         <Member type="Field">private ICourseStatusState _state</Member>
         <Member type="Field">private List&lt;IObserver&gt; _observers</Member>
+        <Member type="Property">public Guid Id { get; set; }</Member>
         <Member type="Property">public Guid CourseId { get; set; }</Member>
         <Member type="Property">public DateTime CaptureTime { get; set; }</Member>
         <Member type="Property">public int EnrollmentCount { get; set; }</Member>
         <Member type="Property">public int ProcessedTopicsCount { get; set; }</Member>
         <Member type="Property">public double AverageGrade { get; set; }</Member>
         <Member type="Property">public CourseStatus Status { get; }</Member>
+        <Member type="Property">public ICourseStatusState CurrentState { get; }</Member>
         <Member type="Constructor">public ParticipantActivity()</Member>
+        <Member type="Constructor">public ParticipantActivity(Guid id, Guid courseId, DateTime captureTime, int enrollmentCount, int processedTopicsCount, double averageGrade, ICourseStatusState initialState)</Member>
         <Member type="Method">public void ChangeState(ICourseStatusState newState)</Member>
         <Member type="Method">public void Subscribe(IObserver observer)</Member>
         <Member type="Method">public void Unsubscribe(IObserver observer)</Member>
         <Member type="Method">public void NotifyObservers(string message)</Member>
+        <Member type="Method">public Contracts.ParticipantActivity ToDto()</Member>
+        <Member type="Method">public static ParticipantActivity FromDto(Contracts.ParticipantActivity dto)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
@@ -167,10 +167,12 @@
         <Name>DeleteCourseCommand</Name>
         <Access>Public</Access>
         <Location left="2045" top="951" />
-        <Size width="235" height="145" />
+        <Size width="280" height="180" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Course _course</Member>
-        <Member type="Field">private ICourseRepository _repository</Member>
+        <Member type="Field">private ICourseRepository _courseRepository</Member>
+        <Member type="Field">private IActivityRepository _activityRepository</Member>
+        <Member type="Field">private List&lt;ParticipantActivity&gt; _deletedActivities</Member>
         <Member type="Method">public void Execute()</Member>
         <Member type="Method">public void Undo()</Member>
         <Modifier>None</Modifier>
@@ -191,9 +193,10 @@
         <Name>EditActivityCommand</Name>
         <Access>Public</Access>
         <Location left="2006" top="427" />
-        <Size width="251" height="146" />
+        <Size width="260" height="163" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">private ParticipantActivity _activity</Member>
+        <Member type="Field">private ParticipantActivity _oldActivity</Member>
+        <Member type="Field">private ParticipantActivity _newActivity</Member>
         <Member type="Field">private IActivityRepository _repository</Member>
         <Member type="Method">public void Execute()</Member>
         <Member type="Method">public void Undo()</Member>
@@ -330,11 +333,13 @@ Contracts DTO on transfer.</Text>
         <Name>IActivityRepository</Name>
         <Access>Public</Access>
         <Location left="1320" top="470" />
-        <Size width="300" height="146" />
+        <Size width="340" height="198" />
         <Collapsed>False</Collapsed>
         <Member type="Method">void Add(ParticipantActivity activity)</Member>
+        <Member type="Method">void AddRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
         <Member type="Method">void Update(ParticipantActivity activity)</Member>
         <Member type="Method">void Remove(ParticipantActivity activity)</Member>
+        <Member type="Method">void RemoveRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
         <Member type="Method">List&lt;ParticipantActivity&gt; GetAll()</Member>
         <Member type="Method">List&lt;ParticipantActivity&gt; GetByCourseAndPeriod(Guid courseId, DateTime from, DateTime to)</Member>
       </Entity>
@@ -356,16 +361,19 @@ Contracts DTO on transfer.</Text>
       <Entity type="Class">
         <Name>ActivityRepository</Name>
         <Access>Public</Access>
-        <Location left="1320" top="660" />
-        <Size width="300" height="196" />
+        <Location left="1320" top="680" />
+        <Size width="370" height="291" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">private List&lt;ParticipantActivity&gt; _activities</Member>
-        <Member type="Field">private IDataPersistence _persistence</Member>
+        <Member type="Field">private IEntityStore&lt;Contracts.ParticipantActivity&gt; _store</Member>
+        <Member type="Constructor">public ActivityRepository(IEntityStore&lt;Contracts.ParticipantActivity&gt; store)</Member>
         <Member type="Method">public void Add(ParticipantActivity activity)</Member>
+        <Member type="Method">public void AddRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
         <Member type="Method">public void Update(ParticipantActivity activity)</Member>
         <Member type="Method">public void Remove(ParticipantActivity activity)</Member>
+        <Member type="Method">public void RemoveRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
         <Member type="Method">public List&lt;ParticipantActivity&gt; GetAll()</Member>
         <Member type="Method">public List&lt;ParticipantActivity&gt; GetByCourseAndPeriod(Guid courseId, DateTime from, DateTime to)</Member>
+        <Member type="Method">private Contracts.ParticipantActivity FindOrThrow(Guid id)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Interface">
@@ -607,16 +615,15 @@ Contracts DTO on transfer.</Text>
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
       </Relationship>
-      <Relationship type="Association" first="28" second="5">
+      <Relationship type="Association" first="28" second="29">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <Direction>Unidirectional</Direction>
-        <AssociationType>Aggregation</AssociationType>
-        <StartRole>_activities</StartRole>
-        <StartMultiplicity>1</StartMultiplicity>
-        <EndMultiplicity>0..*</EndMultiplicity>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_store</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
       <Relationship type="Realization" first="23" second="22">
         <StartOrientation>Vertical</StartOrientation>
@@ -633,16 +640,6 @@ Contracts DTO on transfer.</Text>
           <X>2900</X>
           <Y>1439</Y>
         </BendPoint>
-      </Relationship>
-      <Relationship type="Association" first="28" second="22">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_persistence</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
       <Relationship type="Realization" first="27" second="25">
         <StartOrientation>Vertical</StartOrientation>
@@ -699,7 +696,17 @@ Contracts DTO on transfer.</Text>
         <EndOrientation>Horizontal</EndOrientation>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
-        <StartRole>-_repository</StartRole>
+        <StartRole>-_courseRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="13" second="26">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activityRepository</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
       <Relationship type="Association" first="14" second="26">
