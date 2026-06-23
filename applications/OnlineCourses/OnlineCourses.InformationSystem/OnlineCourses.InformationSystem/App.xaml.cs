@@ -28,11 +28,12 @@ public partial class App : Application
 
         var commandManager = new CommandManager();
         var logObserver    = new LogObserver(Path.Combine(dataDir, "actions.log"));
+        var chartObserver  = new ChartObserver();
 
         // IS-6: Start CoreWCF service host here before showing the window.
 
         var mainViewModel = new MainViewModel(courseRepository, activityRepository,
-            commandManager, logObserver);
+            commandManager, logObserver, chartObserver);
 
         var mainWindow = new MainWindow(mainViewModel);
         MainWindow = mainWindow;

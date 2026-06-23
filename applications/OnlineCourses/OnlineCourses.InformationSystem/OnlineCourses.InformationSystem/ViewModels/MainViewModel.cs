@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 using OnlineCourses.InformationSystem.Commands;
 using OnlineCourses.InformationSystem.Models;
 using OnlineCourses.InformationSystem.Observers;
@@ -18,6 +20,7 @@ public class MainViewModel : ViewModelBase
     private readonly IActivityRepository _activityRepository;
     private readonly CommandManager      _commandManager;
     private readonly IObserver            _logObserver;
+    private readonly ChartObserver        _chartObserver;
 
     private readonly ObservableCollection<CourseViewModel>   _courses    = new();
     private readonly ObservableCollection<ActivityViewModel> _activities = new();
@@ -71,13 +74,18 @@ public class MainViewModel : ViewModelBase
     public ICommand DeleteActivityCommand { get; }
     public ICommand SimulateStatesCommand { get; }
 
+    public ISeries[] ChartSeries => _chartObserver.Series;
+    public Axis[]    ChartXAxes  => _chartObserver.XAxes;
+    public Axis[]    ChartYAxes  => _chartObserver.YAxes;
+
     public MainViewModel(ICourseRepository courseRepository, IActivityRepository activityRepository,
-        CommandManager commandManager, IObserver logObserver)
+        CommandManager commandManager, IObserver logObserver, ChartObserver chartObserver)
     {
         _courseRepository   = courseRepository;
         _activityRepository = activityRepository;
         _commandManager     = commandManager;
         _logObserver        = logObserver;
+        _chartObserver      = chartObserver;
 
         CoursesView    = CollectionViewSource.GetDefaultView(_courses);
         CoursesView.Filter = FilterCourse;
@@ -128,12 +136,20 @@ public class MainViewModel : ViewModelBase
     {
         var selectedId = _selectedActivity?.Id;
         _activities.Clear();
-        if (course == null) return;
+        if (course == null)
+        {
+            _chartObserver.SetActivities([]);
+            return;
+        }
+        var domainActivities = new List<ParticipantActivity>();
         foreach (var a in _activityRepository.GetAll().Where(a => a.CourseId == course.Id))
         {
             a.Subscribe(_logObserver);
+            a.Subscribe(_chartObserver);
+            domainActivities.Add(a);
             _activities.Add(new ActivityViewModel(a, course.Name));
         }
+        _chartObserver.SetActivities(domainActivities);
         SelectedActivity = _activities.FirstOrDefault(a => a.Id == selectedId);
     }
 
@@ -143,8 +159,6 @@ public class MainViewModel : ViewModelBase
          c.Name.Contains(_searchText,     StringComparison.OrdinalIgnoreCase) ||
          c.Field.Contains(_searchText,    StringComparison.OrdinalIgnoreCase) ||
          c.Lecturer.Contains(_searchText, StringComparison.OrdinalIgnoreCase));
-
-    // --- Course CRUD ---
 
     private void ExecuteAddCourse()
     {
@@ -264,12 +278,10 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            // Reset to start of cycle, then drive transitions via the state machine.
             activity.ChangeState(new PopularState());
             vm.RefreshStatus();
             await Task.Delay(600);
 
-            // Loop until the terminal state rather than counting transitions.
             while (!(activity.CurrentState is ArchivedState))
             {
                 activity.CurrentState.HandleState(activity);
@@ -277,7 +289,6 @@ public class MainViewModel : ViewModelBase
                 await Task.Delay(600);
             }
 
-            // Route through CommandManager so simulation is undoable.
             _commandManager.ExecuteCommand(new EditActivityCommand(preSimActivity, activity, _activityRepository));
             _logObserver.Update($"Simulate complete for activity {activity.Id}, final: {activity.Status}");
         }
