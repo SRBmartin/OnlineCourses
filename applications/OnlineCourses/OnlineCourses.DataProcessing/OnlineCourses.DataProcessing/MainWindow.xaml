@@ -22,8 +22,8 @@
                       SelectedItem="{Binding SelectedStrategyName}"
                       Width="200" Margin="2 0"/>
             <Separator Margin="4 0"/>
-            <!-- DP-7: FetchActivitiesCommand will load activities via WCF + adapter -->
-            <Button Content="Fetch Activities"
+            <!-- DP-7: FetchActivitiesCommand loads activities via WCF + adapter -->
+            <Button Content="Fetch Data"
                     Command="{Binding FetchActivitiesCommand}"
                     Padding="8 2" Margin="2 0"/>
             <!-- DP-8: RunStatisticsCommand will run selected strategy -->
@@ -74,17 +74,50 @@
                     <RowDefinition Height="180"/>
                 </Grid.RowDefinitions>
 
-                <!-- DP-7/DP-9: Activities DataGrid — populated by FetchActivitiesCommand -->
+                <!-- DP-7: Activities panel — populated by FetchActivitiesCommand -->
                 <DockPanel Grid.Row="0">
                     <TextBlock DockPanel.Dock="Top"
                                Text="Activities"
                                FontWeight="SemiBold" FontSize="13"
                                Padding="8 6"/>
                     <Border BorderBrush="#DDD" BorderThickness="1 0 0 0">
-                        <!-- DP-9: Replace with DataGrid bound to ActivitiesView -->
-                        <TextBlock Text="Select a course and date range, then click Fetch Activities."
-                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                   Foreground="#999" FontStyle="Italic"/>
+                        <Grid>
+                            <!-- Placeholder: visible only when no data has been fetched yet -->
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Foreground="#999" FontStyle="Italic"
+                                       Text="Select a course and date range, then click Fetch Data.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActivitiesText}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <!-- Dictionary-format data display -->
+                            <TextBox Text="{Binding ActivitiesText, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     Padding="8">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActivitiesText}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
                     </Border>
                 </DockPanel>
 
