@@ -128,10 +128,12 @@
         <Name>CommandManager</Name>
         <Access>Public</Access>
         <Location left="1622" top="276" />
-        <Size width="250" height="179" />
+        <Size width="250" height="213" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Stack&lt;IUndoableCommand&gt; _undoStack</Member>
         <Member type="Field">private Stack&lt;IUndoableCommand&gt; _redoStack</Member>
+        <Member type="Property">public bool CanUndo { get; }</Member>
+        <Member type="Property">public bool CanRedo { get; }</Member>
         <Member type="Event">public event Action HistoryChanged</Member>
         <Member type="Method">public void ExecuteCommand(IUndoableCommand command)</Member>
         <Member type="Method">public void Undo()</Member>
@@ -153,7 +155,7 @@
       <Entity type="Class">
         <Name>EditCourseCommand</Name>
         <Access>Public</Access>
-        <Location left="2045" top="1116" />
+        <Location left="2045" top="1170" />
         <Size width="225" height="163" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Course _oldCourse</Member>
@@ -166,7 +168,7 @@
       <Entity type="Class">
         <Name>DeleteCourseCommand</Name>
         <Access>Public</Access>
-        <Location left="2045" top="951" />
+        <Location left="2045" top="954" />
         <Size width="280" height="180" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Course _course</Member>
@@ -217,7 +219,7 @@
       <Entity type="Class">
         <Name>ChartObserver</Name>
         <Access>Public</Access>
-        <Location left="2710" top="478" />
+        <Location left="2710" top="416" />
         <Size width="325" height="320" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;ParticipantActivity&gt; _trackedActivities</Member>
@@ -237,7 +239,7 @@
       <Entity type="Class">
         <Name>LogObserver</Name>
         <Access>Public</Access>
-        <Location left="2710" top="820" />
+        <Location left="2710" top="773" />
         <Size width="225" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private string _logFilePath</Member>
@@ -253,37 +255,10 @@
         <Member type="Method">List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
         <Member type="Method">List&lt;Course&gt; GetAllCourses()</Member>
       </Entity>
-      <Entity type="Comment">
-        <Text>Design Patterns:
-- Command : undo/redo
-  (AddCourseCommand, EditCourseCommand,
-   DeleteCourseCommand, AddActivityCommand,
-   EditActivityCommand, DeleteActivityCommand)
-- State   : CourseStatus state machine
-  (PopularState, DecliningInterestState,
-   RecommendedState, ArchivedState)
-- Observer: real-time chart + log file
-  (ChartObserver, LogObserver)
-- Strategy : XML/JSON persistence
-  (XmlDataPersistence, JsonDataPersistence)
-+ Repository (architecture): commands and
-  the WCF service work over
-  ICourseRepository / IActivityRepository
-+ Store provider: CourseRepository delegates
-  I/O to IEntityStore&lt;T&gt; / XmlEntityStore&lt;T&gt;
-  (atomic write via temp-file rename)
-
-WCF: IInformationSystemService is [ServiceContract].
-InformationSystemService maps domain
-ParticipantActivity (this diagram) to the
-Contracts DTO on transfer.</Text>
-        <Location left="509" top="1318" />
-        <Size width="265" height="360" />
-      </Entity>
       <Entity type="Class">
         <Name>InformationSystemService</Name>
         <Access>Public</Access>
-        <Location left="2644" top="1060" />
+        <Location left="2644" top="1070" />
         <Size width="295" height="165" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private ICourseRepository _courseRepository</Member>
@@ -294,44 +269,9 @@ Contracts DTO on transfer.</Text>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Interface">
-        <Name>IDataPersistence</Name>
-        <Access>Public</Access>
-        <Location left="2644" top="1285" />
-        <Size width="295" height="129" />
-        <Collapsed>False</Collapsed>
-        <Member type="Method">void SaveCourses(List&lt;Course&gt; courses)</Member>
-        <Member type="Method">List&lt;Course&gt; LoadCourses()</Member>
-        <Member type="Method">void SaveActivities(List&lt;ParticipantActivity&gt; activities)</Member>
-        <Member type="Method">List&lt;ParticipantActivity&gt; LoadActivities()</Member>
-      </Entity>
-      <Entity type="Class">
-        <Name>XmlDataPersistence</Name>
-        <Access>Public</Access>
-        <Location left="2454" top="1457" />
-        <Size width="280" height="145" />
-        <Collapsed>False</Collapsed>
-        <Member type="Method">public void SaveCourses(List&lt;Course&gt; courses)</Member>
-        <Member type="Method">public List&lt;Course&gt; LoadCourses()</Member>
-        <Member type="Method">public void SaveActivities(List&lt;ParticipantActivity&gt; activities)</Member>
-        <Member type="Method">public List&lt;ParticipantActivity&gt; LoadActivities()</Member>
-        <Modifier>None</Modifier>
-      </Entity>
-      <Entity type="Class">
-        <Name>JsonDataPersistence</Name>
-        <Access>Public</Access>
-        <Location left="2754" top="1457" />
-        <Size width="285" height="145" />
-        <Collapsed>False</Collapsed>
-        <Member type="Method">public void SaveCourses(List&lt;Course&gt; courses)</Member>
-        <Member type="Method">public List&lt;Course&gt; LoadCourses()</Member>
-        <Member type="Method">public void SaveActivities(List&lt;ParticipantActivity&gt; activities)</Member>
-        <Member type="Method">public List&lt;ParticipantActivity&gt; LoadActivities()</Member>
-        <Modifier>None</Modifier>
-      </Entity>
-      <Entity type="Interface">
         <Name>ICourseRepository</Name>
         <Access>Public</Access>
-        <Location left="1320" top="950" />
+        <Location left="1234" top="1130" />
         <Size width="280" height="146" />
         <Collapsed>False</Collapsed>
         <Member type="Method">void Add(Course course)</Member>
@@ -343,7 +283,7 @@ Contracts DTO on transfer.</Text>
       <Entity type="Interface">
         <Name>IActivityRepository</Name>
         <Access>Public</Access>
-        <Location left="1320" top="470" />
+        <Location left="1197" top="452" />
         <Size width="340" height="198" />
         <Collapsed>False</Collapsed>
         <Member type="Method">void Add(ParticipantActivity activity)</Member>
@@ -357,7 +297,7 @@ Contracts DTO on transfer.</Text>
       <Entity type="Class">
         <Name>CourseRepository</Name>
         <Access>Public</Access>
-        <Location left="1320" top="1150" />
+        <Location left="1320" top="1393" />
         <Size width="285" height="196" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IEntityStore&lt;Course&gt; _store</Member>
@@ -372,7 +312,7 @@ Contracts DTO on transfer.</Text>
       <Entity type="Class">
         <Name>ActivityRepository</Name>
         <Access>Public</Access>
-        <Location left="1320" top="680" />
+        <Location left="1170" top="697" />
         <Size width="370" height="291" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IEntityStore&lt;Contracts.ParticipantActivity&gt; _store</Member>
@@ -465,7 +405,7 @@ Contracts DTO on transfer.</Text>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
           <X>2814</X>
-          <Y>453</Y>
+          <Y>391</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Realization" first="18" second="0">
@@ -507,6 +447,44 @@ Contracts DTO on transfer.</Text>
         <StartRole>-courseId</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
+      <Relationship type="Association" first="5" second="4">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>637</X>
+          <Y>360</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>+Status</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="6">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="7">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="8">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="9">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
       <Relationship type="Association" first="10" second="2">
         <Label>
         </Label>
@@ -539,11 +517,25 @@ Contracts DTO on transfer.</Text>
         <EndOrientation>Vertical</EndOrientation>
         <BendPoint relativeToStartShape="True">
           <X>2249</X>
-          <Y>1273</Y>
+          <Y>1327</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
-        <StartRole>-_course</StartRole>
+        <StartRole>-_oldCourse</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="12" second="3">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2230</X>
+          <Y>1350</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_newCourse</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
       <Relationship type="Association" first="13" second="3">
@@ -553,7 +545,7 @@ Contracts DTO on transfer.</Text>
         <EndOrientation>Vertical</EndOrientation>
         <BendPoint relativeToStartShape="True">
           <X>2269</X>
-          <Y>1104</Y>
+          <Y>1107</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
@@ -602,155 +594,119 @@ Contracts DTO on transfer.</Text>
         <StartRole>-_activity</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="5" second="4">
-        <Label>
-        </Label>
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-        <BendPoint relativeToStartShape="False">
-          <X>637</X>
-          <Y>360</Y>
-        </BendPoint>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>+Status</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
       <Relationship type="Dependency" first="1" second="4">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
       </Relationship>
-      <Relationship type="Realization" first="21" second="19">
+      <Relationship type="Realization" first="20" second="19">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
       </Relationship>
-      <Relationship type="Association" first="28" second="29">
+      <Relationship type="Association" first="20" second="21">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
-        <StartRole>-_store</StartRole>
+        <StartRole>-_courseRepository</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Realization" first="23" second="22">
+      <Relationship type="Association" first="20" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activityRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="11" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="12" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="13" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_courseRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="13" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activityRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="14" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="15" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="16" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="23" second="21">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
-        <BendPoint relativeToStartShape="False">
-          <X>2706</X>
-          <Y>1439</Y>
-        </BendPoint>
       </Relationship>
       <Relationship type="Realization" first="24" second="22">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
         <BendPoint relativeToStartShape="False">
-          <X>2900</X>
-          <Y>1439</Y>
+          <X>1362</X>
+          <Y>675</Y>
         </BendPoint>
       </Relationship>
-      <Relationship type="Realization" first="27" second="25">
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-      </Relationship>
-      <Relationship type="Realization" first="28" second="26">
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-      </Relationship>
-      <Relationship type="Association" first="21" second="25">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_courseRepository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="21" second="26">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_activityRepository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="11" second="25">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_repository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="12" second="25">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_repository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="13" second="25">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_courseRepository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="13" second="26">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_activityRepository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="14" second="26">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_repository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="15" second="26">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_repository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="16" second="26">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-        <StartRole>-_repository</StartRole>
-        <EndMultiplicity>1</EndMultiplicity>
-      </Relationship>
-      <Relationship type="Association" first="27" second="29">
+      <Relationship type="Association" first="23" second="25">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
@@ -760,7 +716,17 @@ Contracts DTO on transfer.</Text>
         <StartRole>-_store</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Realization" first="30" second="29">
+      <Relationship type="Association" first="24" second="25">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_store</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="26" second="25">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
       </Relationship>
@@ -782,7 +748,7 @@ Contracts DTO on transfer.</Text>
       <Entity type="Class">
         <Name>MinTopicsAndAvgGradeStrategy</Name>
         <Access>Public</Access>
-        <Location left="535" top="806" />
+        <Location left="559" top="1186" />
         <Size width="265" height="145" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IStatisticsCalculator _calculator</Member>
@@ -846,7 +812,7 @@ Contracts DTO on transfer.</Text>
         <Name>ActivityAdapter</Name>
         <Access>Public</Access>
         <Location left="1390" top="820" />
-        <Size width="275" height="94" />
+        <Size width="700" height="94" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; Adapt(List&lt;ParticipantActivity&gt; source, Guid courseId, DateTime from, DateTime to)</Member>
         <Modifier>None</Modifier>
@@ -874,37 +840,10 @@ Contracts DTO on transfer.</Text>
         <Member type="Method">List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
         <Member type="Method">List&lt;Course&gt; GetAllCourses()</Member>
       </Entity>
-      <Entity type="Comment">
-        <Text>Design Patterns:
-- Strategy : 3 interchangeable stat methods
-  (MinTopicsAndAvgGradeStrategy,
-   AverageEnrollmentsStrategy,
-   RecommendedCountStrategy)
-- Adapter  : List&lt;ParticipantActivity&gt; →
-  Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt;
-  (ActivityAdapter)
-
-SOLID notes:
-- SRP: IStatisticsCalculator separates raw
-  calculation from formatting (strategies).
-  StatisticsProcessor only orchestrates;
-  CsvExporter only writes files.
-- DIP: strategies depend on IStatisticsCalculator
-  abstraction, not concrete LINQ logic.
-
-Key format: "CourseID-Date1-Date2".
-Status retained so RecommendedCountStrategy
-can count Recommended occurrences.
-
-WCF: IInformationSystemService is [ServiceContract].
-ParticipantActivity here is the Contracts DTO.</Text>
-        <Location left="19" top="240" />
-        <Size width="360" height="380" />
-      </Entity>
       <Entity type="Enum">
         <Name>CourseStatus</Name>
         <Access>Public</Access>
-        <Location left="1700" top="504" />
+        <Location left="1805" top="504" />
         <Size width="210" height="129" />
         <Collapsed>False</Collapsed>
         <Value>Popular</Value>
@@ -944,7 +883,7 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <Name>StatisticsCalculator</Name>
         <Access>Public</Access>
         <Location left="200" top="960" />
-        <Size width="280" height="129" />
+        <Size width="280" height="145" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public int GetMinTopics(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
         <Member type="Method">public double GetAverageGrade(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
@@ -955,7 +894,7 @@ ParticipantActivity here is the Contracts DTO.</Text>
       <Entity type="Class">
         <Name>WcfInformationSystemService</Name>
         <Access>Public</Access>
-        <Location left="420" top="373" />
+        <Location left="425" top="177" />
         <Size width="400" height="163" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private ChannelFactory&lt;IInformationSystemService&gt; _factory</Member>
@@ -970,8 +909,8 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>825</X>
-          <Y>856</Y>
+          <X>849</X>
+          <Y>1236</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
           <X>968</X>
@@ -1004,31 +943,43 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <StartRole>-_strategy</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="1" second="13">
+      <Relationship type="Association" first="1" second="12">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>506</X>
+          <Y>900</Y>
+        </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
         <StartRole>-_calculator</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="2" second="13">
+      <Relationship type="Association" first="2" second="12">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>509</X>
+          <Y>845</Y>
+        </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
         <StartRole>-_calculator</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="3" second="13">
+      <Relationship type="Association" first="3" second="12">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>505</X>
+          <Y>804</Y>
+        </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
         <StartRole>-_calculator</StartRole>
@@ -1044,7 +995,7 @@ ParticipantActivity here is the Contracts DTO.</Text>
           <Y>795</Y>
         </BendPoint>
       </Relationship>
-      <Relationship type="Association" first="4" second="10">
+      <Relationship type="Association" first="4" second="9">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
@@ -1054,15 +1005,15 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <StartRole>-status</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Realization" first="14" second="13">
+      <Relationship type="Realization" first="13" second="12">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
       </Relationship>
-      <Relationship type="Realization" first="12" second="11">
+      <Relationship type="Realization" first="11" second="10">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
       </Relationship>
-      <Relationship type="Association" first="7" second="11">
+      <Relationship type="Association" first="7" second="10">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
@@ -1072,9 +1023,13 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <StartRole>-_csvExporter</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Realization" first="15" second="8">
-        <StartOrientation>Horizontal</StartOrientation>
+      <Relationship type="Realization" first="14" second="8">
+        <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>612</X>
+          <Y>365</Y>
+        </BendPoint>
       </Relationship>
     </Relationships>
   </ProjectItem>

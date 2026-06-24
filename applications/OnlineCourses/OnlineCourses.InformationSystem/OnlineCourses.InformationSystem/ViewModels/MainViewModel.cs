@@ -27,7 +27,8 @@ public class MainViewModel : ViewModelBase
 
     private CourseViewModel?   _selectedCourse;
     private ActivityViewModel? _selectedActivity;
-    private string             _searchText = string.Empty;
+    private string             _searchText         = string.Empty;
+    private string             _activitySearchText = string.Empty;
     private bool               _isSimulating;
 
     public ICollectionView CoursesView    { get; }
@@ -63,6 +64,16 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    public string ActivitySearchText
+    {
+        get => _activitySearchText;
+        set
+        {
+            if (!SetField(ref _activitySearchText, value)) return;
+            ActivitiesView.Refresh();
+        }
+    }
+
     public ICommand AddCourseCommand    { get; }
     public ICommand EditCourseCommand   { get; }
     public ICommand DeleteCourseCommand { get; }
@@ -91,6 +102,7 @@ public class MainViewModel : ViewModelBase
         CoursesView.Filter = FilterCourse;
 
         ActivitiesView = CollectionViewSource.GetDefaultView(_activities);
+        ActivitiesView.Filter = FilterActivity;
 
         AddCourseCommand    = new RelayCommand(_ => ExecuteAddCourse());
         EditCourseCommand   = new RelayCommand(_ => ExecuteEditCourse(),   _ => _selectedCourse != null);
@@ -159,6 +171,16 @@ public class MainViewModel : ViewModelBase
          c.Name.Contains(_searchText,     StringComparison.OrdinalIgnoreCase) ||
          c.Field.Contains(_searchText,    StringComparison.OrdinalIgnoreCase) ||
          c.Lecturer.Contains(_searchText, StringComparison.OrdinalIgnoreCase));
+
+    private bool FilterActivity(object obj) =>
+        obj is ActivityViewModel a &&
+        (string.IsNullOrEmpty(_activitySearchText) ||
+         a.CourseName.Contains(_activitySearchText,                        StringComparison.OrdinalIgnoreCase) ||
+         a.CaptureTime.ToString("d").Contains(_activitySearchText,         StringComparison.OrdinalIgnoreCase) ||
+         a.EnrollmentCount.ToString().Contains(_activitySearchText,        StringComparison.OrdinalIgnoreCase) ||
+         a.ProcessedTopicsCount.ToString().Contains(_activitySearchText,   StringComparison.OrdinalIgnoreCase) ||
+         a.AverageGrade.ToString("F2").Contains(_activitySearchText,       StringComparison.OrdinalIgnoreCase) ||
+         a.StatusName.Contains(_activitySearchText,                        StringComparison.OrdinalIgnoreCase));
 
     private void ExecuteAddCourse()
     {
