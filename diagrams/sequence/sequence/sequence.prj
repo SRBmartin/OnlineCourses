@@ -1,7 +1,7 @@
 format 224
 "sequence"
-  revision 4
-  modified_by 31 "korisnik"
+  revision 6
+  modified_by 69 "Martin"
 
 
   
@@ -87,7 +87,7 @@ format 224
       
     end
 
-    class 128162 "MainWindow"
+    class 128162 "MainViewModel"
       visibility package 
       cpp_decl ""
       java_decl ""
@@ -111,7 +111,7 @@ format 224
       
     end
 
-    class 128164 "InformationSystemService"
+    class 128164 "WcfInformationSystemService"
       visibility package 
       cpp_decl ""
       java_decl ""
@@ -171,8 +171,8 @@ format 224
       
     end
 
-    classinstance 128169 "mainWindow"
-      type class_ref 128162 // MainWindow
+    classinstance 128169 "vm"
+      type class_ref 128162 // MainViewModel
       attributes
         end
       relations
@@ -188,7 +188,7 @@ format 224
     end
 
     classinstance 128171 "svc"
-      type class_ref 128164 // InformationSystemService
+      type class_ref 128164 // WcfInformationSystemService
       attributes
         end
       relations
