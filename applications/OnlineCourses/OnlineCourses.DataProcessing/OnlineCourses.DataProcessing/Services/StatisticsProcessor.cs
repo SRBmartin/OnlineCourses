@@ -16,7 +16,6 @@ public class StatisticsProcessor
 
     public StatisticsProcessor(IInformationSystemService service, IActivityAdapter adapter, ICsvExporter csvExporter)
     {
-        // DP-7: Assign all injected dependencies.
         _service     = service;
         _adapter     = adapter;
         _csvExporter = csvExporter;
@@ -30,9 +29,9 @@ public class StatisticsProcessor
 
     public string RunStatistics(Guid courseId, DateTime from, DateTime to)
     {
-        // DP-7: Fetch activities from _service, adapt via _adapter, store in _data.
+        // DP-8: Fetch activities from _service, adapt via _adapter, store in _data.
         // DP-8: Call _strategy.Calculate(_data) and return the result string.
-        throw new NotImplementedException("DP-7 / DP-8");
+        throw new NotImplementedException("DP-8");
     }
 
     public void ExportToCsv(string result, string filePath)

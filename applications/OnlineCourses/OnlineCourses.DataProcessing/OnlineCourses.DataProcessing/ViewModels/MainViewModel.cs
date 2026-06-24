@@ -34,7 +34,14 @@ public class MainViewModel : ViewModelBase
     public CourseViewModel? SelectedCourse
     {
         get => _selectedCourse;
-        set => SetField(ref _selectedCourse, value);
+        set
+        {
+            if (SetField(ref _selectedCourse, value))
+            {
+                ActivitiesText = string.Empty;
+                _data = new();
+            }
+        }
     }
 
     public DateTime From
@@ -91,11 +98,11 @@ public class MainViewModel : ViewModelBase
         LoadCourses();
     }
 
-    private void LoadCourses()
+    private async void LoadCourses()
     {
         try
         {
-            var courses = _service.GetAllCourses();
+            var courses = await Task.Run(() => _service.GetAllCourses());
             Courses.Clear();
             foreach (var c in courses)
                 Courses.Add(new CourseViewModel(c));
@@ -106,14 +113,15 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private void FetchActivities()
+    private async void FetchActivities()
     {
+        var courseId = SelectedCourse!.Id;
         try
         {
-            var raw = _service.GetActivities(SelectedCourse!.Id, From, To);
-            _data = _adapter.Adapt(raw, SelectedCourse.Id, From, To);
+            var raw = await Task.Run(() => _service.GetActivities(courseId, From, To));
+            _data = _adapter.Adapt(raw, courseId, From, To);
 
-            if (_data.Count == 0 || _data.Values.All(v => v.Count == 0))
+            if (_data.Values.All(v => v.Count == 0))
             {
                 ActivitiesText = "No data found.";
                 return;
@@ -134,7 +142,7 @@ public class MainViewModel : ViewModelBase
         {
             sb.AppendLine($"{key}:");
             foreach (var a in activities.OrderBy(a => a.CaptureTime))
-                sb.AppendLine($"  {a.CaptureTime:yyyy-MM-dd} -> [{a.EnrollmentCount}, {a.ProcessedTopicsCount}, {a.AverageGrade:F2}]");
+                sb.AppendLine($"  ({a.CaptureTime:yyyy-MM-dd})->[{a.EnrollmentCount}, {a.ProcessedTopicsCount}, {a.AverageGrade:F2}]");
         }
         return sb.ToString().TrimEnd();
     }

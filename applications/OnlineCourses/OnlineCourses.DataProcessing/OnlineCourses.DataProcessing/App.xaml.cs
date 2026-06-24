@@ -92,7 +92,7 @@ public partial class App : Application
         }
 
         MessageBox.Show(
-            "Could not connect to the Information System after 3 attempts.\n" +
+            $"Could not connect to the Information System after {MaxRetries} attempts.\n" +
             "The service is unavailable. Please start OnlineCourses.InformationSystem and try again.",
             "Service Unavailable",
             MessageBoxButton.OK,
