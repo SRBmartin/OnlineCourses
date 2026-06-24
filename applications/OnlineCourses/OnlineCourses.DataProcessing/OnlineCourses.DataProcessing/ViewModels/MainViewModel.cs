@@ -74,6 +74,7 @@ public class MainViewModel : ViewModelBase
     public ICommand FetchActivitiesCommand { get; }
     public ICommand RunStatisticsCommand { get; }
     public ICommand ExportCsvCommand { get; }
+    public ICommand RefreshCoursesCommand { get; }
 
     public MainViewModel(IInformationSystemService service, IActivityAdapter adapter, StatisticsProcessor processor, IStatisticsCalculator calculator)
     {
@@ -93,6 +94,8 @@ public class MainViewModel : ViewModelBase
         ExportCsvCommand = new RelayCommand(
             _ => ExportCsv(),
             _ => !string.IsNullOrEmpty(StatisticsResult));
+
+        RefreshCoursesCommand = new RelayCommand(_ => LoadCourses());
 
         LoadCourses();
     }

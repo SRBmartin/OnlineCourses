@@ -171,6 +171,7 @@ public class MainViewModel : ViewModelBase
 
         var course = vm.ToCourseViewModel().ToModel();
         _commandManager.ExecuteCommand(new AddCourseCommand(course, _courseRepository));
+        _logObserver.Update($"Add course '{course.Name}': field={course.Field}, lecturer={course.Lecturer}");
     }
 
     private void ExecuteEditCourse()
@@ -187,6 +188,7 @@ public class MainViewModel : ViewModelBase
         var oldCourse = _selectedCourse.ToModel();
         var newCourse = vm.ToCourseViewModel(existingId: _selectedCourse.Id).ToModel();
         _commandManager.ExecuteCommand(new EditCourseCommand(oldCourse, newCourse, _courseRepository));
+        _logObserver.Update($"Edit course '{newCourse.Name}': field={newCourse.Field}, lecturer={newCourse.Lecturer}");
     }
 
     private void ExecuteDeleteCourse()
@@ -203,6 +205,7 @@ public class MainViewModel : ViewModelBase
 
         var course = _selectedCourse.ToModel();
         _commandManager.ExecuteCommand(new DeleteCourseCommand(course, _courseRepository, _activityRepository));
+        _logObserver.Update($"Delete course '{course.Name}' ({course.Id})");
     }
 
     private void ExecuteAddActivity()

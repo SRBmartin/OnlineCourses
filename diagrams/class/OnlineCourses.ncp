@@ -237,7 +237,7 @@
       <Entity type="Class">
         <Name>LogObserver</Name>
         <Access>Public</Access>
-        <Location left="2710" top="614" />
+        <Location left="2710" top="820" />
         <Size width="225" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private string _logFilePath</Member>
@@ -952,6 +952,18 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <Member type="Method">public int GetRecommendedCount(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
         <Modifier>None</Modifier>
       </Entity>
+      <Entity type="Class">
+        <Name>WcfInformationSystemService</Name>
+        <Access>Public</Access>
+        <Location left="420" top="373" />
+        <Size width="400" height="163" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ChannelFactory&lt;IInformationSystemService&gt; _factory</Member>
+        <Member type="Constructor">public WcfInformationSystemService(string serviceUrl)</Member>
+        <Member type="Method">public List&lt;Course&gt; GetAllCourses()</Member>
+        <Member type="Method">public List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
     </Entities>
     <Relationships>
       <Relationship type="Realization" first="1" second="0">
@@ -1059,6 +1071,10 @@ ParticipantActivity here is the Contracts DTO.</Text>
         <AssociationType>Association</AssociationType>
         <StartRole>-_csvExporter</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="15" second="8">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
       </Relationship>
     </Relationships>
   </ProjectItem>
