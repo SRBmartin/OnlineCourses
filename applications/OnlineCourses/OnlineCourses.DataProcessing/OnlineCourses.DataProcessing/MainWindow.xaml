@@ -46,10 +46,30 @@
 
             <!-- Left panel: course list -->
             <DockPanel Grid.Column="0">
-                <TextBlock DockPanel.Dock="Top"
-                           Text="Courses"
-                           FontWeight="SemiBold" FontSize="13"
-                           Padding="8 6"/>
+                <Grid DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="Courses"
+                               FontWeight="SemiBold" FontSize="13"
+                               Padding="8 6"
+                               VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            Command="{Binding RefreshCoursesCommand}"
+                            ToolTip="Refresh course list"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Padding="6 4"
+                            Margin="0 2 4 2"
+                            VerticalAlignment="Center"
+                            Cursor="Hand">
+                        <TextBlock Text="&#xE72C;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="14"/>
+                    </Button>
+                </Grid>
                 <ListView ItemsSource="{Binding Courses}"
                           SelectedItem="{Binding SelectedCourse}"
                           BorderThickness="0 1 1 0">
@@ -123,17 +143,50 @@
 
                 <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#DDD"/>
 
-                <!-- DP-8/DP-9: Statistics result area -->
+                <!-- Statistics result area -->
                 <DockPanel Grid.Row="2">
                     <TextBlock DockPanel.Dock="Top"
                                Text="Statistics Result"
                                FontWeight="SemiBold" FontSize="13"
                                Padding="8 6"/>
                     <Border BorderBrush="#DDD" BorderThickness="1 1 0 0">
-                        <!-- DP-9: Replace with TextBox/DataGrid bound to StatisticsResult -->
-                        <TextBlock Text="Select a strategy and click Run Statistics."
-                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                   Foreground="#999" FontStyle="Italic"/>
+                        <Grid>
+                            <!-- Placeholder: visible only when no statistics have been run yet -->
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Foreground="#999" FontStyle="Italic"
+                                       Text="Select a strategy and click Run Statistics.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatisticsResult}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <!-- Statistics result display -->
+                            <TextBox Text="{Binding StatisticsResult, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     Padding="8">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatisticsResult}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
                     </Border>
                 </DockPanel>
             </Grid>

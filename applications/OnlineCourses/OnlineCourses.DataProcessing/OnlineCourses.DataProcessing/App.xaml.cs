@@ -31,10 +31,11 @@ public partial class App : Application
             return;
         }
 
-        var adapter   = new ActivityAdapter();
-        var exporter  = new CsvExporter();
-        var processor = new StatisticsProcessor(service, adapter, exporter);
-        var mainVm    = new MainViewModel(service, adapter, processor);
+        var adapter     = new ActivityAdapter();
+        var exporter    = new CsvExporter();
+        var processor   = new StatisticsProcessor(exporter);
+        var calculator  = new StatisticsCalculator();
+        var mainVm      = new MainViewModel(service, adapter, processor, calculator);
         var mainWindow = new MainWindow(mainVm);
         MainWindow = mainWindow;
         connectionWindow.Close();
@@ -43,6 +44,13 @@ public partial class App : Application
 
     private static async Task<IInformationSystemService?> ConnectWithRetryAsync(ConnectionViewModel vm)
     {
+        var binding = new BasicHttpBinding
+        {
+            OpenTimeout    = TimeSpan.FromSeconds(4),
+            SendTimeout    = TimeSpan.FromSeconds(4),
+            ReceiveTimeout = TimeSpan.FromSeconds(30)
+        };
+
         for (int attempt = 1; attempt <= MaxRetries; attempt++)
         {
             if (vm.CancellationToken.IsCancellationRequested)
@@ -50,26 +58,25 @@ public partial class App : Application
 
             vm.StatusText = $"Connecting to Information System... (attempt {attempt}/{MaxRetries})";
 
-            IInformationSystemService? svc;
+            bool reachable;
             try
             {
-                svc = await Task.Run<IInformationSystemService?>(() =>
+                reachable = await Task.Run(() =>
                 {
+                    // Probe with a throw-away channel; close or abort it after the check.
+                    var probe = new ChannelFactory<IInformationSystemService>(
+                        binding, new EndpointAddress(ServiceUrl)).CreateChannel();
                     try
                     {
-                        var binding = new BasicHttpBinding
-                        {
-                            OpenTimeout    = TimeSpan.FromSeconds(4),
-                            SendTimeout    = TimeSpan.FromSeconds(4),
-                            ReceiveTimeout = TimeSpan.FromSeconds(30)
-                        };
-                        var endpoint = new EndpointAddress(ServiceUrl);
-                        var channel = new ChannelFactory<IInformationSystemService>(binding, endpoint).CreateChannel();
-                        channel.GetAllCourses();
-                        return channel;
+                        probe.GetAllCourses();
+                        ((IClientChannel)probe).Close();
+                        return true;
                     }
-                    catch (OperationCanceledException) { throw; }
-                    catch { return null; }
+                    catch
+                    {
+                        ((IClientChannel)probe).Abort();
+                        return false;
+                    }
                 }, vm.CancellationToken);
             }
             catch (OperationCanceledException)
@@ -77,10 +84,12 @@ public partial class App : Application
                 return null;
             }
 
-            if (svc != null)
+            if (reachable)
             {
                 vm.StatusText = "Connected.";
-                return svc;
+                // Return a fresh-channel-per-call wrapper so a single faulted call
+                // never takes down the whole session.
+                return new WcfInformationSystemService(ServiceUrl);
             }
 
             if (attempt < MaxRetries)

@@ -237,7 +237,7 @@
       <Entity type="Class">
         <Name>LogObserver</Name>
         <Access>Public</Access>
-        <Location left="2710" top="614" />
+        <Location left="2710" top="820" />
         <Size width="225" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private string _logFilePath</Member>
@@ -774,35 +774,45 @@ Contracts DTO on transfer.</Text>
         <Name>IStatisticalStrategy</Name>
         <Access>Public</Access>
         <Location left="993" top="820" />
-        <Size width="265" height="78" />
+        <Size width="265" height="95" />
         <Collapsed>False</Collapsed>
         <Member type="Method">string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
       </Entity>
       <Entity type="Class">
         <Name>MinTopicsAndAvgGradeStrategy</Name>
         <Access>Public</Access>
         <Location left="535" top="806" />
-        <Size width="265" height="94" />
+        <Size width="265" height="145" />
         <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticsCalculator _calculator</Member>
+        <Member type="Constructor">public MinTopicsAndAvgGradeStrategy(IStatisticsCalculator calculator)</Member>
         <Member type="Method">public string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>AverageEnrollmentsStrategy</Name>
         <Access>Public</Access>
         <Location left="936" top="574" />
-        <Size width="372" height="94" />
+        <Size width="372" height="145" />
         <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticsCalculator _calculator</Member>
+        <Member type="Constructor">public AverageEnrollmentsStrategy(IStatisticsCalculator calculator)</Member>
         <Member type="Method">public string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>RecommendedCountStrategy</Name>
         <Access>Public</Access>
         <Location left="993" top="1019" />
-        <Size width="265" height="94" />
+        <Size width="265" height="145" />
         <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticsCalculator _calculator</Member>
+        <Member type="Constructor">public RecommendedCountStrategy(IStatisticsCalculator calculator)</Member>
         <Member type="Method">public string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
@@ -845,17 +855,14 @@ Contracts DTO on transfer.</Text>
         <Name>StatisticsProcessor</Name>
         <Access>Public</Access>
         <Location left="1037" top="23" />
-        <Size width="265" height="236" />
+        <Size width="265" height="179" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IStatisticalStrategy _strategy</Member>
-        <Member type="Field">private IActivityAdapter _adapter</Member>
-        <Member type="Field">private IInformationSystemService _service</Member>
-        <Member type="Field">private Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; _data</Member>
         <Member type="Field">private ICsvExporter _csvExporter</Member>
-        <Member type="Constructor">public StatisticsProcessor(IInformationSystemService service, IActivityAdapter adapter, ICsvExporter csvExporter)</Member>
+        <Member type="Constructor">public StatisticsProcessor(ICsvExporter csvExporter)</Member>
         <Member type="Method">public void SetStrategy(IStatisticalStrategy strategy)</Member>
-        <Member type="Method">public string RunStatistics(Guid courseId, DateTime from, DateTime to)</Member>
-        <Member type="Method">public void ExportToCsv(string result, string filePath)</Member>
+        <Member type="Method">public string RunStatistics(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public void ExportToCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data, string filePath)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Interface">
@@ -877,16 +884,22 @@ Contracts DTO on transfer.</Text>
   Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt;
   (ActivityAdapter)
 
-Note: ReducedActivity keeps only concrete
-activity data; key format "CourseID-Date1-Date2".
-Status is retained so RecommendedCountStrategy
+SOLID notes:
+- SRP: IStatisticsCalculator separates raw
+  calculation from formatting (strategies).
+  StatisticsProcessor only orchestrates;
+  CsvExporter only writes files.
+- DIP: strategies depend on IStatisticsCalculator
+  abstraction, not concrete LINQ logic.
+
+Key format: "CourseID-Date1-Date2".
+Status retained so RecommendedCountStrategy
 can count Recommended occurrences.
 
 WCF: IInformationSystemService is [ServiceContract].
-ParticipantActivity here is the Contracts DTO
-([DataContract], data fields only).</Text>
+ParticipantActivity here is the Contracts DTO.</Text>
         <Location left="19" top="240" />
-        <Size width="360" height="300" />
+        <Size width="360" height="380" />
       </Entity>
       <Entity type="Enum">
         <Name>CourseStatus</Name>
@@ -914,6 +927,41 @@ ParticipantActivity here is the Contracts DTO
         <Size width="280" height="94" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public void Export(string content, string filePath)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IStatisticsCalculator</Name>
+        <Access>Public</Access>
+        <Location left="200" top="780" />
+        <Size width="280" height="129" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">int GetMinTopics(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">double GetAverageGrade(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">double GetAverageEnrollments(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">int GetRecommendedCount(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>StatisticsCalculator</Name>
+        <Access>Public</Access>
+        <Location left="200" top="960" />
+        <Size width="280" height="129" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public int GetMinTopics(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">public double GetAverageGrade(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">public double GetAverageEnrollments(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">public int GetRecommendedCount(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>WcfInformationSystemService</Name>
+        <Access>Public</Access>
+        <Location left="420" top="373" />
+        <Size width="400" height="163" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ChannelFactory&lt;IInformationSystemService&gt; _factory</Member>
+        <Member type="Constructor">public WcfInformationSystemService(string serviceUrl)</Member>
+        <Member type="Method">public List&lt;Course&gt; GetAllCourses()</Member>
+        <Member type="Method">public List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
         <Modifier>None</Modifier>
       </Entity>
     </Entities>
@@ -956,24 +1004,34 @@ ParticipantActivity here is the Contracts DTO
         <StartRole>-_strategy</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="7" second="5">
+      <Relationship type="Association" first="1" second="13">
         <Label>
         </Label>
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
-        <StartRole>-_adapter</StartRole>
+        <StartRole>-_calculator</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="7" second="8">
+      <Relationship type="Association" first="2" second="13">
         <Label>
         </Label>
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
         <Direction>Unidirectional</Direction>
         <AssociationType>Association</AssociationType>
-        <StartRole>-_service</StartRole>
+        <StartRole>-_calculator</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="3" second="13">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_calculator</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
       <Relationship type="Dependency" first="6" second="4">
@@ -996,20 +1054,9 @@ ParticipantActivity here is the Contracts DTO
         <StartRole>-status</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Association" first="7" second="4">
-        <Label>
-        </Label>
-        <StartOrientation>Horizontal</StartOrientation>
+      <Relationship type="Realization" first="14" second="13">
+        <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
-        <BendPoint relativeToStartShape="True">
-          <X>1330</X>
-          <Y>110</Y>
-        </BendPoint>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Aggregation</AssociationType>
-        <StartRole>-_data</StartRole>
-        <StartMultiplicity>1</StartMultiplicity>
-        <EndMultiplicity>0..*</EndMultiplicity>
       </Relationship>
       <Relationship type="Realization" first="12" second="11">
         <StartOrientation>Vertical</StartOrientation>
@@ -1024,6 +1071,10 @@ ParticipantActivity here is the Contracts DTO
         <AssociationType>Association</AssociationType>
         <StartRole>-_csvExporter</StartRole>
         <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="15" second="8">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
       </Relationship>
     </Relationships>
   </ProjectItem>
