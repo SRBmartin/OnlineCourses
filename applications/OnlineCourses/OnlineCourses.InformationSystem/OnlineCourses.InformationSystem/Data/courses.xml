@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfCourse>
+  <Course>
+    <Id>d1e2f3a4-b5c6-d7e8-f9a0-b1c2d3e4f5a6</Id>
+    <Name>Design Patterns in C#</Name>
+    <Field>Software Engineering</Field>
+    <Lecturer>dr Ana Jovanovic</Lecturer>
+  </Course>
+  <Course>
+    <Id>e2f3a4b5-c6d7-e8f9-a0b1-c2d3e4f5a6b7</Id>
+    <Name>Distributed Systems</Name>
+    <Field>Computer Science</Field>
+    <Lecturer>Prof. dr Milana Petkovic</Lecturer>
+  </Course>
+  <Course>
+    <Id>f3a4b5c6-d7e8-f9a0-b1c2-d3e4f5a6b7c8</Id>
+    <Name>Web Services and SOA</Name>
+    <Field>Software Engineering</Field>
+    <Lecturer>dr Jelena Petrovic</Lecturer>
+  </Course>
+</ArrayOfCourse>

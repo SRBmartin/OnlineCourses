@@ -1,0 +1,1036 @@
+<Project>
+  <Name>OnlineCourses - Tim 44</Name>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>Component 1 - Information System</Name>
+    <Language>CSharp</Language>
+    <Entities>
+      <Entity type="Interface">
+        <Name>IObserver</Name>
+        <Access>Public</Access>
+        <Location left="58" top="59" />
+        <Size width="225" height="78" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void Update(string message)</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>ICourseStatusState</Name>
+        <Access>Public</Access>
+        <Location left="211" top="170" />
+        <Size width="260" height="95" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void HandleState(ParticipantActivity context)</Member>
+        <Member type="Method">CourseStatus GetStatus()</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IUndoableCommand</Name>
+        <Access>Public</Access>
+        <Location left="861" top="202" />
+        <Size width="225" height="95" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void Execute()</Member>
+        <Member type="Method">void Undo()</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>Course</Name>
+        <Access>Public</Access>
+        <Location left="211" top="303" />
+        <Size width="260" height="230" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Guid id</Member>
+        <Member type="Field">private string name</Member>
+        <Member type="Field">private string field</Member>
+        <Member type="Field">private string lecturer</Member>
+        <Member type="Property">public Guid Id { get; set; }</Member>
+        <Member type="Property">public string Name { get; set; }</Member>
+        <Member type="Property">public string Field { get; set; }</Member>
+        <Member type="Property">public string Lecturer { get; set; }</Member>
+        <Member type="Constructor">public Course()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Enum">
+        <Name>CourseStatus</Name>
+        <Access>Public</Access>
+        <Location left="629" top="202" />
+        <Size width="210" height="129" />
+        <Collapsed>False</Collapsed>
+        <Value>Popular</Value>
+        <Value>DecliningInterest</Value>
+        <Value>Recommended</Value>
+        <Value>Archived</Value>
+      </Entity>
+      <Entity type="Class">
+        <Name>ParticipantActivity</Name>
+        <Access>Public</Access>
+        <Location left="67" top="1318" />
+        <Size width="350" height="510" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ICourseStatusState _state</Member>
+        <Member type="Field">private List&lt;IObserver&gt; _observers</Member>
+        <Member type="Property">public Guid Id { get; set; }</Member>
+        <Member type="Property">public Guid CourseId { get; set; }</Member>
+        <Member type="Property">public DateTime CaptureTime { get; set; }</Member>
+        <Member type="Property">public int EnrollmentCount { get; set; }</Member>
+        <Member type="Property">public int ProcessedTopicsCount { get; set; }</Member>
+        <Member type="Property">public double AverageGrade { get; set; }</Member>
+        <Member type="Property">public CourseStatus Status { get; }</Member>
+        <Member type="Property">public ICourseStatusState CurrentState { get; }</Member>
+        <Member type="Constructor">public ParticipantActivity()</Member>
+        <Member type="Constructor">public ParticipantActivity(Guid id, Guid courseId, DateTime captureTime, int enrollmentCount, int processedTopicsCount, double averageGrade, ICourseStatusState initialState)</Member>
+        <Member type="Method">public void ChangeState(ICourseStatusState newState)</Member>
+        <Member type="Method">public void Subscribe(IObserver observer)</Member>
+        <Member type="Method">public void Unsubscribe(IObserver observer)</Member>
+        <Member type="Method">public void NotifyObservers(string message)</Member>
+        <Member type="Method">public Contracts.ParticipantActivity ToDto()</Member>
+        <Member type="Method">public static ParticipantActivity FromDto(Contracts.ParticipantActivity dto)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>PopularState</Name>
+        <Access>Public</Access>
+        <Location left="683" top="381" />
+        <Size width="276" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public void HandleState(ParticipantActivity context)</Member>
+        <Member type="Method">public CourseStatus GetStatus()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>DecliningInterestState</Name>
+        <Access>Public</Access>
+        <Location left="683" top="517" />
+        <Size width="276" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public void HandleState(ParticipantActivity context)</Member>
+        <Member type="Method">public CourseStatus GetStatus()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>RecommendedState</Name>
+        <Access>Public</Access>
+        <Location left="683" top="684" />
+        <Size width="276" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public void HandleState(ParticipantActivity context)</Member>
+        <Member type="Method">public CourseStatus GetStatus()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ArchivedState</Name>
+        <Access>Public</Access>
+        <Location left="683" top="830" />
+        <Size width="276" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public void HandleState(ParticipantActivity context)</Member>
+        <Member type="Method">public CourseStatus GetStatus()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>CommandManager</Name>
+        <Access>Public</Access>
+        <Location left="1622" top="276" />
+        <Size width="250" height="213" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Stack&lt;IUndoableCommand&gt; _undoStack</Member>
+        <Member type="Field">private Stack&lt;IUndoableCommand&gt; _redoStack</Member>
+        <Member type="Property">public bool CanUndo { get; }</Member>
+        <Member type="Property">public bool CanRedo { get; }</Member>
+        <Member type="Event">public event Action HistoryChanged</Member>
+        <Member type="Method">public void ExecuteCommand(IUndoableCommand command)</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Member type="Method">public void Redo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>AddCourseCommand</Name>
+        <Access>Public</Access>
+        <Location left="2045" top="790" />
+        <Size width="225" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Course _course</Member>
+        <Member type="Field">private ICourseRepository _repository</Member>
+        <Member type="Method">public void Execute()</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>EditCourseCommand</Name>
+        <Access>Public</Access>
+        <Location left="2045" top="1170" />
+        <Size width="225" height="163" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Course _oldCourse</Member>
+        <Member type="Field">private Course _newCourse</Member>
+        <Member type="Field">private ICourseRepository _repository</Member>
+        <Member type="Method">public void Execute()</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>DeleteCourseCommand</Name>
+        <Access>Public</Access>
+        <Location left="2045" top="954" />
+        <Size width="280" height="180" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Course _course</Member>
+        <Member type="Field">private ICourseRepository _courseRepository</Member>
+        <Member type="Field">private IActivityRepository _activityRepository</Member>
+        <Member type="Field">private List&lt;ParticipantActivity&gt; _deletedActivities</Member>
+        <Member type="Method">public void Execute()</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>AddActivityCommand</Name>
+        <Access>Public</Access>
+        <Location left="2006" top="101" />
+        <Size width="245" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ParticipantActivity _activity</Member>
+        <Member type="Field">private IActivityRepository _repository</Member>
+        <Member type="Method">public void Execute()</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>EditActivityCommand</Name>
+        <Access>Public</Access>
+        <Location left="2006" top="427" />
+        <Size width="260" height="163" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ParticipantActivity _oldActivity</Member>
+        <Member type="Field">private ParticipantActivity _newActivity</Member>
+        <Member type="Field">private IActivityRepository _repository</Member>
+        <Member type="Method">public void Execute()</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>DeleteActivityCommand</Name>
+        <Access>Public</Access>
+        <Location left="1994" top="264" />
+        <Size width="265" height="148" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ParticipantActivity _activity</Member>
+        <Member type="Field">private IActivityRepository _repository</Member>
+        <Member type="Method">public void Execute()</Member>
+        <Member type="Method">public void Undo()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ChartObserver</Name>
+        <Access>Public</Access>
+        <Location left="2710" top="416" />
+        <Size width="325" height="320" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;ParticipantActivity&gt; _trackedActivities</Member>
+        <Member type="Field">private ObservableValue _popularValue</Member>
+        <Member type="Field">private ObservableValue _decliningValue</Member>
+        <Member type="Field">private ObservableValue _recommendedValue</Member>
+        <Member type="Field">private ObservableValue _archivedValue</Member>
+        <Member type="Property">public ISeries[] Series { get; }</Member>
+        <Member type="Property">public Axis[] XAxes { get; }</Member>
+        <Member type="Property">public Axis[] YAxes { get; }</Member>
+        <Member type="Constructor">public ChartObserver()</Member>
+        <Member type="Method">public void SetActivities(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
+        <Member type="Method">public void Update(string message)</Member>
+        <Member type="Method">private void Recount()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>LogObserver</Name>
+        <Access>Public</Access>
+        <Location left="2710" top="773" />
+        <Size width="225" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private string _logFilePath</Member>
+        <Member type="Method">public void Update(string message)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IInformationSystemService</Name>
+        <Access>Public</Access>
+        <Location left="2644" top="912" />
+        <Size width="295" height="95" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
+        <Member type="Method">List&lt;Course&gt; GetAllCourses()</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>InformationSystemService</Name>
+        <Access>Public</Access>
+        <Location left="2644" top="1070" />
+        <Size width="295" height="165" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ICourseRepository _courseRepository</Member>
+        <Member type="Field">private IActivityRepository _activityRepository</Member>
+        <Member type="Constructor">public InformationSystemService(ICourseRepository courseRepository, IActivityRepository activityRepository)</Member>
+        <Member type="Method">public List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
+        <Member type="Method">public List&lt;Course&gt; GetAllCourses()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>ICourseRepository</Name>
+        <Access>Public</Access>
+        <Location left="1234" top="1130" />
+        <Size width="280" height="146" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void Add(Course course)</Member>
+        <Member type="Method">void Update(Course course)</Member>
+        <Member type="Method">void Remove(Guid id)</Member>
+        <Member type="Method">List&lt;Course&gt; GetAll()</Member>
+        <Member type="Method">Course GetById(Guid id)</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IActivityRepository</Name>
+        <Access>Public</Access>
+        <Location left="1197" top="452" />
+        <Size width="340" height="198" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void Add(ParticipantActivity activity)</Member>
+        <Member type="Method">void AddRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
+        <Member type="Method">void Update(ParticipantActivity activity)</Member>
+        <Member type="Method">void Remove(ParticipantActivity activity)</Member>
+        <Member type="Method">void RemoveRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
+        <Member type="Method">List&lt;ParticipantActivity&gt; GetAll()</Member>
+        <Member type="Method">List&lt;ParticipantActivity&gt; GetByCourseAndPeriod(Guid courseId, DateTime from, DateTime to)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>CourseRepository</Name>
+        <Access>Public</Access>
+        <Location left="1320" top="1393" />
+        <Size width="285" height="196" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private IEntityStore&lt;Course&gt; _store</Member>
+        <Member type="Constructor">public CourseRepository(IEntityStore&lt;Course&gt; store)</Member>
+        <Member type="Method">public void Add(Course course)</Member>
+        <Member type="Method">public void Update(Course course)</Member>
+        <Member type="Method">public void Remove(Guid id)</Member>
+        <Member type="Method">public List&lt;Course&gt; GetAll()</Member>
+        <Member type="Method">public Course GetById(Guid id)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ActivityRepository</Name>
+        <Access>Public</Access>
+        <Location left="1170" top="697" />
+        <Size width="370" height="291" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private IEntityStore&lt;Contracts.ParticipantActivity&gt; _store</Member>
+        <Member type="Constructor">public ActivityRepository(IEntityStore&lt;Contracts.ParticipantActivity&gt; store)</Member>
+        <Member type="Method">public void Add(ParticipantActivity activity)</Member>
+        <Member type="Method">public void AddRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
+        <Member type="Method">public void Update(ParticipantActivity activity)</Member>
+        <Member type="Method">public void Remove(ParticipantActivity activity)</Member>
+        <Member type="Method">public void RemoveRange(IEnumerable&lt;ParticipantActivity&gt; activities)</Member>
+        <Member type="Method">public List&lt;ParticipantActivity&gt; GetAll()</Member>
+        <Member type="Method">public List&lt;ParticipantActivity&gt; GetByCourseAndPeriod(Guid courseId, DateTime from, DateTime to)</Member>
+        <Member type="Method">private Contracts.ParticipantActivity FindOrThrow(Guid id)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IEntityStore&lt;T&gt;</Name>
+        <Access>Public</Access>
+        <Location left="1700" top="1349" />
+        <Size width="295" height="129" />
+        <Collapsed>False</Collapsed>
+        <Member type="Property">IReadOnlyList&lt;T&gt; Items { get; }</Member>
+        <Member type="Method">void Add(T item)</Member>
+        <Member type="Method">void Remove(T item)</Member>
+        <Member type="Method">void Save()</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>XmlEntityStore&lt;T&gt;</Name>
+        <Access>Public</Access>
+        <Location left="1700" top="1545" />
+        <Size width="295" height="213" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private string _filePath</Member>
+        <Member type="Field">private List&lt;T&gt; _items</Member>
+        <Member type="Field">private XmlSerializer _serializer</Member>
+        <Member type="Constructor">public XmlEntityStore(string filePath)</Member>
+        <Member type="Property">public IReadOnlyList&lt;T&gt; Items { get; }</Member>
+        <Member type="Method">public void Add(T item)</Member>
+        <Member type="Method">public void Remove(T item)</Member>
+        <Member type="Method">public void Save()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+    </Entities>
+    <Relationships>
+      <Relationship type="Realization" first="6" second="1">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="7" second="1">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="8" second="1">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="9" second="1">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="11" second="2">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="12" second="2">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="13" second="2">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="14" second="2">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="15" second="2">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="16" second="2">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2152</X>
+          <Y>239</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="17" second="0">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2814</X>
+          <Y>391</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="18" second="0">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="5" second="1">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>186</X>
+          <Y>220</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_state</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="5" second="0">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+        <StartRole>-_observers</StartRole>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>0..*</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="5" second="3">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-courseId</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="5" second="4">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>637</X>
+          <Y>360</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>+Status</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="6">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="7">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="8">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="5" second="9">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="10" second="2">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1737</X>
+          <Y>251</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+        <StartRole>-_undoStack / -_redoStack</StartRole>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>0..*</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="11" second="3">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_course</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="12" second="3">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2249</X>
+          <Y>1327</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_oldCourse</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="12" second="3">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2230</X>
+          <Y>1350</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_newCourse</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="13" second="3">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2269</X>
+          <Y>1107</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_course</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="14" second="5">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2276</X>
+          <Y>161</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activity</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="15" second="5">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2312</X>
+          <Y>494</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activity</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="16" second="5">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>2318</X>
+          <Y>337</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activity</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Dependency" first="1" second="4">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="20" second="19">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="20" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_courseRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="20" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activityRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="11" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="12" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="13" second="21">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_courseRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="13" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_activityRepository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="14" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="15" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="16" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_repository</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="23" second="21">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="24" second="22">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>1362</X>
+          <Y>675</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Association" first="23" second="25">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_store</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="24" second="25">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_store</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="26" second="25">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+    </Relationships>
+  </ProjectItem>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>Component 2 - Statistical Data Processing</Name>
+    <Language>CSharp</Language>
+    <Entities>
+      <Entity type="Interface">
+        <Name>IStatisticalStrategy</Name>
+        <Access>Public</Access>
+        <Location left="993" top="820" />
+        <Size width="265" height="95" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>MinTopicsAndAvgGradeStrategy</Name>
+        <Access>Public</Access>
+        <Location left="559" top="1186" />
+        <Size width="265" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticsCalculator _calculator</Member>
+        <Member type="Constructor">public MinTopicsAndAvgGradeStrategy(IStatisticsCalculator calculator)</Member>
+        <Member type="Method">public string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>AverageEnrollmentsStrategy</Name>
+        <Access>Public</Access>
+        <Location left="936" top="574" />
+        <Size width="372" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticsCalculator _calculator</Member>
+        <Member type="Constructor">public AverageEnrollmentsStrategy(IStatisticsCalculator calculator)</Member>
+        <Member type="Method">public string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>RecommendedCountStrategy</Name>
+        <Access>Public</Access>
+        <Location left="993" top="1019" />
+        <Size width="265" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticsCalculator _calculator</Member>
+        <Member type="Constructor">public RecommendedCountStrategy(IStatisticsCalculator calculator)</Member>
+        <Member type="Method">public string Calculate(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public string CalculateCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ReducedActivity</Name>
+        <Access>Public</Access>
+        <Location left="1403" top="462" />
+        <Size width="255" height="266" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private DateTime captureTime</Member>
+        <Member type="Field">private int enrollmentCount</Member>
+        <Member type="Field">private int processedTopicsCount</Member>
+        <Member type="Field">private double averageGrade</Member>
+        <Member type="Field">private CourseStatus status</Member>
+        <Member type="Property">public DateTime CaptureTime { get; set; }</Member>
+        <Member type="Property">public int EnrollmentCount { get; set; }</Member>
+        <Member type="Property">public int ProcessedTopicsCount { get; set; }</Member>
+        <Member type="Property">public double AverageGrade { get; set; }</Member>
+        <Member type="Property">public CourseStatus Status { get; set; }</Member>
+        <Member type="Constructor">public ReducedActivity()</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IActivityAdapter</Name>
+        <Access>Public</Access>
+        <Location left="1403" top="1019" />
+        <Size width="275" height="78" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; Adapt(List&lt;ParticipantActivity&gt; source, Guid courseId, DateTime from, DateTime to)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>ActivityAdapter</Name>
+        <Access>Public</Access>
+        <Location left="1390" top="820" />
+        <Size width="700" height="94" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; Adapt(List&lt;ParticipantActivity&gt; source, Guid courseId, DateTime from, DateTime to)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>StatisticsProcessor</Name>
+        <Access>Public</Access>
+        <Location left="1037" top="23" />
+        <Size width="265" height="179" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private IStatisticalStrategy _strategy</Member>
+        <Member type="Field">private ICsvExporter _csvExporter</Member>
+        <Member type="Constructor">public StatisticsProcessor(ICsvExporter csvExporter)</Member>
+        <Member type="Method">public void SetStrategy(IStatisticalStrategy strategy)</Member>
+        <Member type="Method">public string RunStatistics(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data)</Member>
+        <Member type="Method">public void ExportToCsv(Dictionary&lt;string, List&lt;ReducedActivity&gt;&gt; data, string filePath)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IInformationSystemService</Name>
+        <Access>Public</Access>
+        <Location left="842" top="373" />
+        <Size width="467" height="95" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
+        <Member type="Method">List&lt;Course&gt; GetAllCourses()</Member>
+      </Entity>
+      <Entity type="Enum">
+        <Name>CourseStatus</Name>
+        <Access>Public</Access>
+        <Location left="1805" top="504" />
+        <Size width="210" height="129" />
+        <Collapsed>False</Collapsed>
+        <Value>Popular</Value>
+        <Value>DecliningInterest</Value>
+        <Value>Recommended</Value>
+        <Value>Archived</Value>
+      </Entity>
+      <Entity type="Interface">
+        <Name>ICsvExporter</Name>
+        <Access>Public</Access>
+        <Location left="1665" top="40" />
+        <Size width="280" height="78" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void Export(string content, string filePath)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>CsvExporter</Name>
+        <Access>Public</Access>
+        <Location left="1665" top="181" />
+        <Size width="280" height="94" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public void Export(string content, string filePath)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IStatisticsCalculator</Name>
+        <Access>Public</Access>
+        <Location left="200" top="780" />
+        <Size width="280" height="129" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">int GetMinTopics(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">double GetAverageGrade(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">double GetAverageEnrollments(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">int GetRecommendedCount(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>StatisticsCalculator</Name>
+        <Access>Public</Access>
+        <Location left="200" top="960" />
+        <Size width="280" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public int GetMinTopics(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">public double GetAverageGrade(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">public double GetAverageEnrollments(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Member type="Method">public int GetRecommendedCount(IEnumerable&lt;ReducedActivity&gt; activities)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>WcfInformationSystemService</Name>
+        <Access>Public</Access>
+        <Location left="425" top="177" />
+        <Size width="400" height="163" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private ChannelFactory&lt;IInformationSystemService&gt; _factory</Member>
+        <Member type="Constructor">public WcfInformationSystemService(string serviceUrl)</Member>
+        <Member type="Method">public List&lt;Course&gt; GetAllCourses()</Member>
+        <Member type="Method">public List&lt;ParticipantActivity&gt; GetActivities(Guid courseId, DateTime from, DateTime to)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+    </Entities>
+    <Relationships>
+      <Relationship type="Realization" first="1" second="0">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>849</X>
+          <Y>1236</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>968</X>
+          <Y>855</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="2" second="0">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="3" second="0">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="6" second="5">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="7" second="0">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1330</X>
+          <Y>198</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_strategy</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="1" second="12">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>506</X>
+          <Y>900</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_calculator</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="2" second="12">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>509</X>
+          <Y>845</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_calculator</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="3" second="12">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>505</X>
+          <Y>804</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_calculator</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Dependency" first="6" second="4">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1527</X>
+          <Y>795</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Association" first="4" second="9">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-status</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="13" second="12">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="11" second="10">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="7" second="10">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartRole>-_csvExporter</StartRole>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Realization" first="14" second="8">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>612</X>
+          <Y>365</Y>
+        </BendPoint>
+      </Relationship>
+    </Relationships>
+  </ProjectItem>
+</Project>

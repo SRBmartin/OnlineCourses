@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="OnlineCourses.Contracts/OnlineCourses.Contracts/OnlineCourses.Contracts.csproj" />
+  <Project Path="OnlineCourses.DataProcessing/OnlineCourses.DataProcessing/OnlineCourses.DataProcessing.csproj" />
+  <Project Path="OnlineCourses.InformationSystem/OnlineCourses.InformationSystem/OnlineCourses.InformationSystem.csproj" />
+</Solution>

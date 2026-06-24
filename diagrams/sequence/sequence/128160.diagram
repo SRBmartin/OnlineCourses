@@ -1,0 +1,184 @@
+format 224
+
+classinstance 128176 class_ref 128161 // User
+  name ""   xyz 14.94 4.92 2000 life_line_z 2000
+classinstancecanvas 128177 classinstance_ref 128169 // vm
+  xyz 130.42 4.76 2000 life_line_z 2000
+end
+classinstancecanvas 128178 classinstance_ref 128170 // proc
+  xyz 264.22 4.76 2000 life_line_z 2000
+end
+classinstancecanvas 128179 classinstance_ref 128171 // svc
+  xyz 407.4 4.24 2000 life_line_z 2000
+end
+classinstancecanvas 128180 classinstance_ref 128172 // actRepo
+  xyz 558.46 30.4 2000 life_line_z 2000
+end
+classinstancecanvas 128181 classinstance_ref 128173 // adapter
+  xyz 688.72 4.76 2000 life_line_z 2000
+end
+classinstancecanvas 128182 classinstance_ref 128174 // strategy
+  xyz 824.06 4.76 2000 life_line_z 2000
+end
+classinstancecanvas 128183 classinstance_ref 128175 // exporter
+  xyz 1022.2 4.24 2000 life_line_z 2000
+end
+durationcanvas 128185 classinstance_ref 128176 // :User
+  xyzwh 23 96 2010 11 360
+end
+durationcanvas 128186 classinstance_ref 128177 // vm:MainViewModel
+  xyzwh 175 96 2010 11 365
+end
+durationcanvas 128187 classinstance_ref 128178 // proc:StatisticsProcessor
+  xyzwh 322 255 2010 11 14
+end
+durationcanvas 128188 classinstance_ref 128179 // svc:WcfInformationSystemService
+  xyzwh 490 116 2010 11 66
+end
+durationcanvas 128189 classinstance_ref 128180 // actRepo:ActivityRepository
+  xyzwh 624 136 2010 11 31
+end
+durationcanvas 128190 classinstance_ref 128181 // adapter:ActivityAdapter
+  xyzwh 747 186 2010 11 31
+end
+durationcanvas 128191 classinstance_ref 128182 // strategy:AverageEnrollmentsStrategy
+  xyzwh 916 290 2010 11 29
+end
+durationcanvas 128192 classinstance_ref 128183 // exporter:CsvExporter
+  xyzwh 1075 416 2010 11 31
+end
+durationcanvas 128209 classinstance_ref 128178 // proc:StatisticsProcessor
+  xyzwh 322 273 2010 11 60
+end
+durationcanvas 128210 classinstance_ref 128178 // proc:StatisticsProcessor
+  xyzwh 322 373 2010 11 88
+end
+durationcanvas 128217 classinstance_ref 128182 // strategy:AverageEnrollmentsStrategy
+  xyzwh 916 388 2010 11 26
+end
+msg 128194 synchronous
+  from durationcanvas_ref 128185
+  to durationcanvas_ref 128186
+  yz 96 2015 explicitmsg "FetchActivities()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 43 84
+msg 128195 synchronous
+  from durationcanvas_ref 128186
+  to durationcanvas_ref 128187
+  yz 255 2015 explicitmsg "SetStrategy()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "new AverageEnrollmentsStrategy(_calculator)"
+  label_xy 212 243
+msg 128196 synchronous
+  from durationcanvas_ref 128186
+  to durationcanvas_ref 128209
+  yz 273 2015 explicitmsg "RunStatistics()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "_data"
+  label_xy 212 261
+msg 128197 synchronous
+  from durationcanvas_ref 128186
+  to durationcanvas_ref 128188
+  yz 116 2015 explicitmsg "GetActivities()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "courseId, from, to"
+  label_xy 212 104
+msg 128198 synchronous
+  from durationcanvas_ref 128188
+  to durationcanvas_ref 128189
+  yz 136 2015 explicitmsg "GetByCourseAndPeriod()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "courseId, from, to"
+  label_xy 488 124
+msg 128199 return
+  from durationcanvas_ref 128189
+  to durationcanvas_ref 128188
+  yz 156 2015 explicitmsg ": List<ParticipantActivity>"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 491 144
+msg 128200 return
+  from durationcanvas_ref 128188
+  to durationcanvas_ref 128186
+  yz 171 2015 explicitmsg ": List<ParticipantActivity>"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 212 159
+msg 128201 synchronous
+  from durationcanvas_ref 128186
+  to durationcanvas_ref 128190
+  yz 186 2015 explicitmsg "Adapt()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "raw, courseId, from, to"
+  label_xy 212 174
+msg 128202 return
+  from durationcanvas_ref 128190
+  to durationcanvas_ref 128186
+  yz 206 2015 explicitmsg ": Dictionary<string, List<ReducedActivity>>"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 400 194
+msg 128203 synchronous
+  from durationcanvas_ref 128209
+  to durationcanvas_ref 128191
+  yz 290 2015 explicitmsg "Calculate(_data)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 342 278
+msg 128204 return
+  from durationcanvas_ref 128191
+  to durationcanvas_ref 128209
+  yz 308 2015 explicitmsg ": string"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 624 296
+msg 128205 return
+  from durationcanvas_ref 128209
+  to durationcanvas_ref 128186
+  yz 322 2015 explicitmsg ": string"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 262 310
+msg 128206 synchronous
+  from durationcanvas_ref 128186
+  to durationcanvas_ref 128210
+  yz 373 2015 explicitmsg "ExportToCsv()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "_data, filePath"
+  label_xy 212 361
+msg 128207 synchronous
+  from durationcanvas_ref 128210
+  to durationcanvas_ref 128192
+  yz 416 2015 explicitmsg "Export()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  args "csvContent, filePath"
+  label_xy 342 404
+msg 128211 return
+  from durationcanvas_ref 128192
+  to durationcanvas_ref 128210
+  yz 436 2015 unspecifiedmsg
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+msg 128212 return
+  from durationcanvas_ref 128210
+  to durationcanvas_ref 128186
+  yz 450 2015 unspecifiedmsg
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+msg 128213 synchronous
+  from durationcanvas_ref 128185
+  to durationcanvas_ref 128186
+  yz 236 2015 explicitmsg "RunStatistics()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 43 224
+msg 128214 synchronous
+  from durationcanvas_ref 128185
+  to durationcanvas_ref 128186
+  yz 355 2015 explicitmsg "ExportCsv()"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 43 343
+msg 128215 synchronous
+  from durationcanvas_ref 128210
+  to durationcanvas_ref 128217
+  yz 388 2015 explicitmsg "CalculateCsv(_data)"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 342 376
+msg 128216 return
+  from durationcanvas_ref 128217
+  to durationcanvas_ref 128210
+  yz 403 2015 explicitmsg ": string"
+  show_full_operations_definition default show_class_of_operation default drawing_language default show_context_mode default
+  label_xy 624 391
+end

@@ -1,0 +1,12 @@
+window_sizes 2560 1057 600 1955 891 120
+
+diagrams
+  active  sequencediagram_ref 128160 // SD - Statistics Processing
+    1955 891 162 A3 0 0
+end
+show_stereotypes
+selected class_ref 128161 // User
+open
+  usecaseview_ref 128159 // OnlineCourses
+end
+end
