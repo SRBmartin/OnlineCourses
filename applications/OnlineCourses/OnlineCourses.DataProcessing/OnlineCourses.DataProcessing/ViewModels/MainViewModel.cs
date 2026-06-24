@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows.Input;
+using Microsoft.Win32;
 using OnlineCourses.Contracts;
 using OnlineCourses.DataProcessing.Adapters;
 using OnlineCourses.DataProcessing.Models;
 using OnlineCourses.DataProcessing.Services;
+using OnlineCourses.DataProcessing.Strategies;
 
 namespace OnlineCourses.DataProcessing.ViewModels;
 
@@ -13,12 +15,14 @@ public class MainViewModel : ViewModelBase
     private readonly IInformationSystemService _service;
     private readonly IActivityAdapter _adapter;
     private readonly StatisticsProcessor _processor;
+    private readonly IStatisticsCalculator _calculator;
 
     private CourseViewModel? _selectedCourse;
     private DateTime         _from = DateTime.Today.AddMonths(-1);
     private DateTime         _to   = DateTime.Today;
     private string           _selectedStrategyName = string.Empty;
     private string           _activitiesText       = string.Empty;
+    private string           _statisticsResult     = string.Empty;
 
     private Dictionary<string, List<ReducedActivity>> _data = new();
 
@@ -34,14 +38,7 @@ public class MainViewModel : ViewModelBase
     public CourseViewModel? SelectedCourse
     {
         get => _selectedCourse;
-        set
-        {
-            if (SetField(ref _selectedCourse, value))
-            {
-                ActivitiesText = string.Empty;
-                _data = new();
-            }
-        }
+        set => SetField(ref _selectedCourse, value);
     }
 
     public DateTime From
@@ -68,20 +65,22 @@ public class MainViewModel : ViewModelBase
         private set => SetField(ref _activitiesText, value);
     }
 
+    public string StatisticsResult
+    {
+        get => _statisticsResult;
+        private set => SetField(ref _statisticsResult, value);
+    }
+
     public ICommand FetchActivitiesCommand { get; }
-
-    // DP-8: RunStatisticsCommand — resolves strategy from SelectedStrategyName,
-    //        calls StatisticsProcessor.SetStrategy + RunStatistics, updates StatisticsResult.
     public ICommand RunStatisticsCommand { get; }
-
-    // DP-9: ExportCsvCommand — calls StatisticsProcessor.ExportToCsv with a SaveFileDialog path.
     public ICommand ExportCsvCommand { get; }
 
-    public MainViewModel(IInformationSystemService service, IActivityAdapter adapter, StatisticsProcessor processor)
+    public MainViewModel(IInformationSystemService service, IActivityAdapter adapter, StatisticsProcessor processor, IStatisticsCalculator calculator)
     {
-        _service   = service;
-        _adapter   = adapter;
-        _processor = processor;
+        _service    = service;
+        _adapter    = adapter;
+        _processor  = processor;
+        _calculator = calculator;
 
         FetchActivitiesCommand = new RelayCommand(
             _ => FetchActivities(),
@@ -93,7 +92,7 @@ public class MainViewModel : ViewModelBase
 
         ExportCsvCommand = new RelayCommand(
             _ => ExportCsv(),
-            _ => false); // DP-9: enable when statistics result is available
+            _ => !string.IsNullOrEmpty(StatisticsResult));
 
         LoadCourses();
     }
@@ -119,7 +118,9 @@ public class MainViewModel : ViewModelBase
         try
         {
             var raw = await Task.Run(() => _service.GetActivities(courseId, From, To));
-            _data = _adapter.Adapt(raw, courseId, From, To);
+            var newEntries = _adapter.Adapt(raw, courseId, From, To);
+            foreach (var (key, value) in newEntries)
+                _data[key] = value;
 
             if (_data.Values.All(v => v.Count == 0))
             {
@@ -140,23 +141,78 @@ public class MainViewModel : ViewModelBase
         var sb = new StringBuilder();
         foreach (var (key, activities) in data)
         {
-            sb.AppendLine($"{key}:");
-            foreach (var a in activities.OrderBy(a => a.CaptureTime))
-                sb.AppendLine($"  ({a.CaptureTime:yyyy-MM-dd})->[{a.EnrollmentCount}, {a.ProcessedTopicsCount}, {a.AverageGrade:F2}]");
+            sb.Append($"{key}: ");
+            var ordered = activities.OrderBy(a => a.CaptureTime).ToList();
+            DateTime? lastDate = null;
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var a = ordered[i];
+                if (i > 0) sb.Append(", ");
+                var date = a.CaptureTime.Date;
+                if (lastDate != date)
+                {
+                    sb.Append($"({a.CaptureTime:yyyy-MM-dd})->[{a.EnrollmentCount}, {a.ProcessedTopicsCount}, {a.AverageGrade:F2}]");
+                    lastDate = date;
+                }
+                else
+                {
+                    sb.Append($"[{a.EnrollmentCount}, {a.ProcessedTopicsCount}, {a.AverageGrade:F2}]");
+                }
+            }
+            sb.AppendLine();
         }
         return sb.ToString().TrimEnd();
     }
 
-    private void RunStatistics()
+    private IStatisticalStrategy? ResolveStrategy() => SelectedStrategyName switch
     {
-        // DP-8: Resolve IStatisticalStrategy from SelectedStrategyName,
-        //        call StatisticsProcessor.SetStrategy + RunStatistics, show result.
-        throw new NotImplementedException("DP-8");
+        "Min Topics & Avg Grade" => new MinTopicsAndAvgGradeStrategy(_calculator),
+        "Average Enrollments"    => new AverageEnrollmentsStrategy(_calculator),
+        "Recommended Count"      => new RecommendedCountStrategy(_calculator),
+        _                        => null
+    };
+
+    private async void RunStatistics()
+    {
+        var strategy = ResolveStrategy();
+        if (strategy == null) return;
+
+        _processor.SetStrategy(strategy);
+        var data = _data;
+        try
+        {
+            var result = await Task.Run(() => _processor.RunStatistics(data));
+            StatisticsResult = result;
+        }
+        catch (Exception)
+        {
+            StatisticsResult = "Error: Statistics calculation failed.";
+        }
     }
 
     private void ExportCsv()
     {
-        // DP-9: Show SaveFileDialog, call StatisticsProcessor.ExportToCsv.
-        throw new NotImplementedException("DP-9");
+        var dialog = new SaveFileDialog
+        {
+            Title      = "Export Statistics to CSV",
+            Filter     = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+            DefaultExt = ".csv",
+            FileName   = "statistics_result"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        try
+        {
+            _processor.ExportToCsv(_data, dialog.FileName);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(
+                $"Export failed: {ex.Message}",
+                "Export Error",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error);
+        }
     }
 }

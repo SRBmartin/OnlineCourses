@@ -31,10 +31,11 @@ public partial class App : Application
             return;
         }
 
-        var adapter   = new ActivityAdapter();
-        var exporter  = new CsvExporter();
-        var processor = new StatisticsProcessor(service, adapter, exporter);
-        var mainVm    = new MainViewModel(service, adapter, processor);
+        var adapter     = new ActivityAdapter();
+        var exporter    = new CsvExporter();
+        var processor   = new StatisticsProcessor(exporter);
+        var calculator  = new StatisticsCalculator();
+        var mainVm      = new MainViewModel(service, adapter, processor, calculator);
         var mainWindow = new MainWindow(mainVm);
         MainWindow = mainWindow;
         connectionWindow.Close();

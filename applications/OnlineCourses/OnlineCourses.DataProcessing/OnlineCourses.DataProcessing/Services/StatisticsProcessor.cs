@@ -1,5 +1,3 @@
-using OnlineCourses.Contracts;
-using OnlineCourses.DataProcessing.Adapters;
 using OnlineCourses.DataProcessing.Export;
 using OnlineCourses.DataProcessing.Models;
 using OnlineCourses.DataProcessing.Strategies;
@@ -9,34 +7,24 @@ namespace OnlineCourses.DataProcessing.Services;
 public class StatisticsProcessor
 {
     private IStatisticalStrategy? _strategy;
-    private readonly IActivityAdapter _adapter;
-    private readonly IInformationSystemService _service;
-    private Dictionary<string, List<ReducedActivity>> _data = new();
     private readonly ICsvExporter _csvExporter;
 
-    public StatisticsProcessor(IInformationSystemService service, IActivityAdapter adapter, ICsvExporter csvExporter)
+    public StatisticsProcessor(ICsvExporter csvExporter)
     {
-        _service     = service;
-        _adapter     = adapter;
         _csvExporter = csvExporter;
     }
 
-    public void SetStrategy(IStatisticalStrategy strategy)
+    public void SetStrategy(IStatisticalStrategy strategy) => _strategy = strategy;
+
+    public string RunStatistics(Dictionary<string, List<ReducedActivity>> data)
     {
-        // DP-8: Assign the chosen strategy (Strategy pattern).
-        _strategy = strategy;
+        if (_strategy == null) return "No strategy selected.";
+        return _strategy.Calculate(data);
     }
 
-    public string RunStatistics(Guid courseId, DateTime from, DateTime to)
+    public void ExportToCsv(Dictionary<string, List<ReducedActivity>> data, string filePath)
     {
-        // DP-8: Fetch activities from _service, adapt via _adapter, store in _data.
-        // DP-8: Call _strategy.Calculate(_data) and return the result string.
-        throw new NotImplementedException("DP-8");
-    }
-
-    public void ExportToCsv(string result, string filePath)
-    {
-        // DP-9: Delegate to _csvExporter.Export.
-        _csvExporter.Export(result, filePath);
+        if (_strategy == null) return;
+        _csvExporter.Export(_strategy.CalculateCsv(data), filePath);
     }
 }
