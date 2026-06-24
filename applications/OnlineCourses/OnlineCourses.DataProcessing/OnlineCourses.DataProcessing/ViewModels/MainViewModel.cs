@@ -1,17 +1,26 @@
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows.Input;
 using OnlineCourses.Contracts;
+using OnlineCourses.DataProcessing.Adapters;
+using OnlineCourses.DataProcessing.Models;
+using OnlineCourses.DataProcessing.Services;
 
 namespace OnlineCourses.DataProcessing.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
     private readonly IInformationSystemService _service;
+    private readonly IActivityAdapter _adapter;
+    private readonly StatisticsProcessor _processor;
 
     private CourseViewModel? _selectedCourse;
     private DateTime         _from = DateTime.Today.AddMonths(-1);
     private DateTime         _to   = DateTime.Today;
     private string           _selectedStrategyName = string.Empty;
+    private string           _activitiesText       = string.Empty;
+
+    private Dictionary<string, List<ReducedActivity>> _data = new();
 
     public ObservableCollection<CourseViewModel> Courses { get; } = new();
 
@@ -25,7 +34,14 @@ public class MainViewModel : ViewModelBase
     public CourseViewModel? SelectedCourse
     {
         get => _selectedCourse;
-        set => SetField(ref _selectedCourse, value);
+        set
+        {
+            if (SetField(ref _selectedCourse, value))
+            {
+                ActivitiesText = string.Empty;
+                _data = new();
+            }
+        }
     }
 
     public DateTime From
@@ -46,8 +62,12 @@ public class MainViewModel : ViewModelBase
         set => SetField(ref _selectedStrategyName, value);
     }
 
-    // DP-7: FetchActivitiesCommand — calls service.GetActivities, runs ActivityAdapter.Adapt,
-    //        stores result in StatisticsProcessor._data, populates ActivitiesView.
+    public string ActivitiesText
+    {
+        get => _activitiesText;
+        private set => SetField(ref _activitiesText, value);
+    }
+
     public ICommand FetchActivitiesCommand { get; }
 
     // DP-8: RunStatisticsCommand — resolves strategy from SelectedStrategyName,
@@ -57,9 +77,11 @@ public class MainViewModel : ViewModelBase
     // DP-9: ExportCsvCommand — calls StatisticsProcessor.ExportToCsv with a SaveFileDialog path.
     public ICommand ExportCsvCommand { get; }
 
-    public MainViewModel(IInformationSystemService service)
+    public MainViewModel(IInformationSystemService service, IActivityAdapter adapter, StatisticsProcessor processor)
     {
-        _service = service;
+        _service   = service;
+        _adapter   = adapter;
+        _processor = processor;
 
         FetchActivitiesCommand = new RelayCommand(
             _ => FetchActivities(),
@@ -76,19 +98,53 @@ public class MainViewModel : ViewModelBase
         LoadCourses();
     }
 
-    private void LoadCourses()
+    private async void LoadCourses()
     {
-        var courses = _service.GetAllCourses();
-        Courses.Clear();
-        foreach (var c in courses)
-            Courses.Add(new CourseViewModel(c));
+        try
+        {
+            var courses = await Task.Run(() => _service.GetAllCourses());
+            Courses.Clear();
+            foreach (var c in courses)
+                Courses.Add(new CourseViewModel(c));
+        }
+        catch (Exception)
+        {
+            ActivitiesText = "Error: Information System is unavailable.";
+        }
     }
 
-    private void FetchActivities()
+    private async void FetchActivities()
     {
-        // DP-7: Call _service.GetActivities(SelectedCourse!.Id, From, To),
-        //        adapt result via ActivityAdapter, store in StatisticsProcessor.
-        throw new NotImplementedException("DP-7");
+        var courseId = SelectedCourse!.Id;
+        try
+        {
+            var raw = await Task.Run(() => _service.GetActivities(courseId, From, To));
+            _data = _adapter.Adapt(raw, courseId, From, To);
+
+            if (_data.Values.All(v => v.Count == 0))
+            {
+                ActivitiesText = "No data found.";
+                return;
+            }
+
+            ActivitiesText = FormatData(_data);
+        }
+        catch (Exception)
+        {
+            ActivitiesText = "Error: Information System is unavailable.";
+        }
+    }
+
+    private static string FormatData(Dictionary<string, List<ReducedActivity>> data)
+    {
+        var sb = new StringBuilder();
+        foreach (var (key, activities) in data)
+        {
+            sb.AppendLine($"{key}:");
+            foreach (var a in activities.OrderBy(a => a.CaptureTime))
+                sb.AppendLine($"  ({a.CaptureTime:yyyy-MM-dd})->[{a.EnrollmentCount}, {a.ProcessedTopicsCount}, {a.AverageGrade:F2}]");
+        }
+        return sb.ToString().TrimEnd();
     }
 
     private void RunStatistics()

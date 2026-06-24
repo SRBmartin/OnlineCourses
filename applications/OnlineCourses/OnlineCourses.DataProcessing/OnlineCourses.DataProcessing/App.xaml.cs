@@ -1,6 +1,9 @@
 using System.ServiceModel;
 using System.Windows;
 using OnlineCourses.Contracts;
+using OnlineCourses.DataProcessing.Adapters;
+using OnlineCourses.DataProcessing.Export;
+using OnlineCourses.DataProcessing.Services;
 using OnlineCourses.DataProcessing.ViewModels;
 using OnlineCourses.DataProcessing.Views;
 
@@ -8,7 +11,8 @@ namespace OnlineCourses.DataProcessing;
 
 public partial class App : Application
 {
-    private const string ServiceUrl = "http://localhost:20000/InformationSystemService";
+    private const string ServiceUrl  = "http://localhost:20000/InformationSystemService";
+    private const int    MaxRetries  = 3;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -27,7 +31,10 @@ public partial class App : Application
             return;
         }
 
-        var mainVm = new MainViewModel(service);
+        var adapter   = new ActivityAdapter();
+        var exporter  = new CsvExporter();
+        var processor = new StatisticsProcessor(service, adapter, exporter);
+        var mainVm    = new MainViewModel(service, adapter, processor);
         var mainWindow = new MainWindow(mainVm);
         MainWindow = mainWindow;
         connectionWindow.Close();
@@ -36,47 +43,61 @@ public partial class App : Application
 
     private static async Task<IInformationSystemService?> ConnectWithRetryAsync(ConnectionViewModel vm)
     {
-        int attempt = 0;
-        while (!vm.CancellationToken.IsCancellationRequested)
+        for (int attempt = 1; attempt <= MaxRetries; attempt++)
         {
-            attempt++;
-            vm.StatusText = $"Connecting to Information System... (attempt {attempt})";
+            if (vm.CancellationToken.IsCancellationRequested)
+                return null;
+
+            vm.StatusText = $"Connecting to Information System... (attempt {attempt}/{MaxRetries})";
+
+            IInformationSystemService? svc;
             try
             {
-                var channel = await Task.Run(() =>
+                svc = await Task.Run<IInformationSystemService?>(() =>
                 {
-                    var binding = new BasicHttpBinding
+                    try
                     {
-                        OpenTimeout    = TimeSpan.FromSeconds(4),
-                        SendTimeout    = TimeSpan.FromSeconds(4),
-                        ReceiveTimeout = TimeSpan.FromSeconds(30)
-                    };
-                    var endpoint = new EndpointAddress(ServiceUrl);
-                    var svc = new ChannelFactory<IInformationSystemService>(binding, endpoint).CreateChannel();
-                    svc.GetAllCourses();
-                    return svc;
+                        var binding = new BasicHttpBinding
+                        {
+                            OpenTimeout    = TimeSpan.FromSeconds(4),
+                            SendTimeout    = TimeSpan.FromSeconds(4),
+                            ReceiveTimeout = TimeSpan.FromSeconds(30)
+                        };
+                        var endpoint = new EndpointAddress(ServiceUrl);
+                        var channel = new ChannelFactory<IInformationSystemService>(binding, endpoint).CreateChannel();
+                        channel.GetAllCourses();
+                        return channel;
+                    }
+                    catch (OperationCanceledException) { throw; }
+                    catch { return null; }
                 }, vm.CancellationToken);
-
-                vm.StatusText = "Connected.";
-                return channel;
             }
             catch (OperationCanceledException)
             {
                 return null;
             }
-            catch
+
+            if (svc != null)
             {
-                vm.StatusText = $"Information System not available. Retrying in 2s... (attempt {attempt})";
-                try
-                {
-                    await Task.Delay(2000, vm.CancellationToken);
-                }
-                catch
-                {
-                    return null;
-                }
+                vm.StatusText = "Connected.";
+                return svc;
+            }
+
+            if (attempt < MaxRetries)
+            {
+                vm.StatusText = $"Information System not available. Retrying in 4s... (attempt {attempt}/{MaxRetries})";
+                try { await Task.Delay(4000, vm.CancellationToken); }
+                catch (OperationCanceledException) { return null; }
             }
         }
+
+        MessageBox.Show(
+            $"Could not connect to the Information System after {MaxRetries} attempts.\n" +
+            "The service is unavailable. Please start OnlineCourses.InformationSystem and try again.",
+            "Service Unavailable",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+
         return null;
     }
 }
