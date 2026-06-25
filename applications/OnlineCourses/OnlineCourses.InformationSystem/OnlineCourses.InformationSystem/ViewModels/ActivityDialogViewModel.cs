@@ -120,6 +120,11 @@ public class ActivityDialogViewModel : ViewModelBase
             ValidationError = "Average grade must be a number between 0 and 10.";
             return false;
         }
+        if (CaptureTime > DateTime.Today)
+        {
+            ValidationError = "Activity date cannot be in the future.";
+            return false;
+        }
         ValidationError = string.Empty;
         return true;
     }
