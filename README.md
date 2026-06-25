@@ -3,7 +3,7 @@ Project for University - Development of layered applications. Utilizing .NET Cor
 
 ## Design Patterns
 
-The two components communicate over WCF. Each pattern was applied where a concrete problem required it, not speculatively.
+The two components communicate over WCF.
 
 ---
 
